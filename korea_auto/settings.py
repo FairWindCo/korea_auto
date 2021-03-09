@@ -26,6 +26,8 @@ environ.Env.read_env()  # reading .env file
 # False if not in os.environ
 DEBUG = env.bool('DEBUG')
 SECRET_KEY = env.str('SECRET_KEY')
+KOREA_SITE_USER = env.str('KOREA_SITE_LOGIN')
+KOREA_SITE_PASS = env.str('KOREA_SITE_PASSWORD')
 
 ALLOWED_HOSTS = []
 

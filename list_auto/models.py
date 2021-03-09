@@ -41,7 +41,7 @@ class CarVersion(models.Model):
         verbose_name_plural = 'Версия Модели'
 
     def __str__(self):
-        return self.name
+        return f'{self.model_version} {self.name}'
 
 
 class CarOptions(models.Model):
@@ -112,7 +112,18 @@ class Car(models.Model):
     vin_number = models.CharField(verbose_name='VIN CODE', max_length=25)
     mileage = models.IntegerField(default=0, verbose_name='Пробег')
     jesi_no = models.IntegerField(default=0, verbose_name='JESI site code')
-    description = models.TextField(verbose_name='Описание')
+    first_register_date = models.DateField(verbose_name='Дата первой регистации', blank=True, null=True)
+    description = models.TextField(verbose_name='Описание', blank=True, null=True)
+    checkout_no = models.IntegerField(default=-1, verbose_name='CheckoutNo')
+    label_image_count = models.IntegerField(default=0, verbose_name='Кол-во флажков изображений')
+    price = models.IntegerField(verbose_name='Цена')
+    price_dealer = models.IntegerField(verbose_name='Цена Диллера', blank=True, null=True)
+    price_sale = models.IntegerField(verbose_name='Цена Продавца', blank=True, null=True)
+    lot_register_date = models.DateField(verbose_name='Дата создания лота', blank=True, null=True)
+    created = models.DateTimeField(auto_created=True, verbose_name='Дата добавления в БД')
+    car_smear = models.BooleanField(default=None, verbose_name='Наличие пятен', blank=True, null=True)
+    car_transformation = models.BooleanField(default=None, verbose_name='Наличие модификаций (изменений)', blank=True,
+                                             null=True)
 
     def __str__(self):
         return f'[{self.car_code}] {self.model_version}'
