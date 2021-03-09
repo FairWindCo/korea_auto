@@ -7,7 +7,7 @@ from bs4 import BeautifulSoup
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.datetime_safe import datetime
 
-from importer.report_processor import get_images_counts, process_vin
+from importer.report_processor import get_images_counts, process_report_file
 from list_auto.models import Brand, CarModel, CarVersion, TransmissionsType, GasolineType, Color, Car, CarOptions
 
 
@@ -130,7 +130,7 @@ class Command(BaseCommand):
                             big_images, small_images = get_images_counts(path, dir)
                             car.image_count = big_images
                             car.label_image_count = small_images
-                            vin, reg_date = process_vin(path, dir, translator)
+                            vin, reg_date = process_report_file(path, dir, translator)
                             car.vin_number = vin
                             car.first_register_date = reg_date
                             car.save()

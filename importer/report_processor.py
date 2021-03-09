@@ -118,7 +118,7 @@ def process_first_registration(records, start_index, max_index):
     return start_index + 1, reg_date
 
 
-def process_vin(path, dir, translator, can_save=True):
+def process_report_file(path, dir, translator, can_save=True):
     file_path = os.path.abspath(os.path.join(path, dir, 'add.html'))
     if os.path.exists(file_path) and os.path.isfile(file_path):
         try:
