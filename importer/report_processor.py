@@ -118,13 +118,30 @@ def process_first_registration(records, start_index, max_index):
     return start_index + 1, reg_date
 
 
-def process_report_file(path, dir, translator, can_save=True):
+def process_report_file(path, dir, translator, can_save=True, replace_standart=True):
     file_path = os.path.abspath(os.path.join(path, dir, 'add.html'))
     if os.path.exists(file_path) and os.path.isfile(file_path):
         try:
             with open(file_path, 'r', encoding='utf8') as file:
                 content = file.read()
-            soup = BeautifulSoup(content.replace('만원', ' дес. тыс. Вон'), 'html.parser')
+            if replace_standart:
+                replacer = {
+                    '만원': ' дес. тыс. Вон',
+                    '없음': 'Нет',
+                    '있음': 'Есть',
+                    '양호': 'Хорошо',
+                    '불량': 'Плохо',
+                    '미세누유': 'Микропротекание',
+                    '누유': 'Утечка',
+                    '적정': 'Адекватно',
+                    '부족': 'Мало',
+                    '과다': 'Много',
+
+                }
+                for key, val in replacer.items():
+                    content = content.replace(key, val)
+                    # content = content.replace('만원', ' дес. тыс. Вон').replace('없음', 'Нет').replace('있음', 'Есть')
+            soup = BeautifulSoup(content, 'html.parser')
             records = soup.find_all('tr')
             index = 0
             table_1 = soup.find('table', attrs={
