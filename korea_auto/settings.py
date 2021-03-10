@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'list_auto',
+    'vue_utils'
 ]
 
 MIDDLEWARE = [

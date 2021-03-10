@@ -6,7 +6,7 @@ import base64
 import json
 import os
 import re
-from urllib.parse import quote
+from urllib.parse import quote, urlparse
 
 import requests
 from bs4 import BeautifulSoup
@@ -185,8 +185,31 @@ def login(user, password):
         print(resp.text)
 
 
+def get_and_write_file_cached(cache, index, url, path, name, session, save_original_name=False, add_name_part='img',
+                              base_site_url='', return_content_cached=False):
+    if url[0] == '.' and url[1] == '/':
+        url = url[1:]
+    if url not in cache:
+        content, file_name = get_and_write_file(url, path, f'{index}{name}', session, save_original_name, add_name_part,
+                                                base_site_url)
+        cache[url] = file_name
+        return content, file_name
+    else:
+        file_name = cache[url]
+        if return_content_cached:
+            file_path = os.path.join(path, file_name)
+            try:
+                with open(file_path, 'rb') as file:
+                    content = file.read()
+                return content, file_name
+            except Exception as e:
+                print(f'READ FILE {file_path} EXCEPTION: {e}')
+                return None, file_name
+        else:
+            return True, file_name
 
-def get_and_write_file(url, path, name, session):
+
+def get_and_write_file(url, path, name, session, save_original_name=False, add_name_part='img', base_site_url=''):
     header = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
@@ -194,15 +217,33 @@ def get_and_write_file(url, path, name, session):
         'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7,ru;q=0.6',
         'sec-ch-ua': '"Chromium";v="88", "Google Chrome";v="88", ";Not A Brand";v="99"',
     }
-    r = session.get(url, headers=header)
-    if r.status_code == 200:
-        with open(f'{path}/{name}', 'wb') as file:
-            file.write(r.content)
-        print(f'WRITE {url} to FILE {path}/{name}')
-        return r.content
+    if not url.startswith('http'):
+        file_url = base_site_url + url
     else:
-        print(f'WRITE ERROR {r.status_code} IN {url}')
-        return None
+        file_url = url
+    r = session.get(file_url, headers=header)
+    if r.status_code == 200:
+        if save_original_name:
+            url_elements = urlparse(file_url)
+            if url_elements:
+                file_part = os.path.basename(url_elements.path)
+                file_name = f'{add_name_part}_{file_part}'
+            else:
+                file_name = f'{add_name_part}_{name}'
+        else:
+            file_name = f'{add_name_part}_{name}' if add_name_part else name
+        file_path = os.path.join(path, file_name)
+        try:
+            with open(file_path, 'wb') as file:
+                file.write(r.content)
+            print(f'WRITE URL="{url}" to FILE "{file_path}"')
+            return r.content, file_name
+        except Exception as e:
+            print(f'WRITE ERROR: {e} FOR URL "{url}"')
+            return None, file_name
+    else:
+        print(f'GET ERROR: {r.status_code} FOR URL "{url}"')
+        return None, None
 
 
 reg_exp = re.compile(r'[0-9]+')
@@ -210,25 +251,22 @@ reg_exp_url = re.compile((r'url\([A-Za-z0-9\/\.-_]+\)'))
 
 
 def process_protocol(code, path, session):
-    content = get_and_write_file(f'http://autocafe.co.kr/ASSO/CarCheck_Form.asp?OnCarNo={code}', path, 'add.html', session)
+    content, file_name = get_and_write_file(f'http://autocafe.co.kr/ASSO/CarCheck_Form.asp?OnCarNo={code}', path,
+                                            'add.html',
+                                            session)
     soap = BeautifulSoup(content, 'html.parser')
     protocol_image = 1
     url_replaced = {}
     images = soap.find_all('img')
     for image in images:
         url_img = image.attrs['src']
-        if not url_img in url_replaced:
-            key = url_img
-            if not url_img.startswith('http'):
-                url_img = 'http://autocafe.co.kr/ASSO/' + url_img
-            image_file = f'protocol_img_{protocol_image}.jpg'
-            res = get_and_write_file(url_img, path, image_file, session)
-            if res:
-                url_replaced[key] = image_file
-                image.attrs['src'] = image_file
-                protocol_image += 1
-        else:
-            image.attrs['src'] = url_replaced[url_img]
+        res, file_name = get_and_write_file_cached(url_replaced, protocol_image, url_img, path,
+                                                   f'img_{protocol_image}.jpg', session, True,
+                                                   'protocol',
+                                                   'http://autocafe.co.kr/ASSO/')
+        if res:
+            image.attrs['src'] = file_name
+            protocol_image += 1
     tables = soap.find_all('table', attrs={
         'title': '자동차 종합상태'
     })
@@ -239,18 +277,13 @@ def process_protocol(code, path, session):
                 val = reg_exp_url.findall(div.attrs['style'])
                 if val:
                     url_img = val[0][4:-1]
-                    if not url_img in url_replaced:
-                        key = url_img
-                        if not url_img.startswith('http'):
-                            url_img = 'http://autocafe.co.kr/ASSO/' + url_img
-                        image_file = f'protocol_img_{protocol_image}.jpg'
-                        res = get_and_write_file(url_img, path, image_file, session)
-                        if res:
-                            url_replaced[key] = image_file
-                            div.attrs['style'] = reg_exp_url.sub(f"url({image_file})", div.attrs['style'])
-                            protocol_image += 1
-                    else:
-                        div.attrs['style'] = reg_exp_url.sub(f"url({url_replaced[url_img]})", div.attrs['style'])
+                    res, file_name = get_and_write_file_cached(url_replaced, protocol_image, url_img, path,
+                                                               f'img_{protocol_image}.jpg', session, True,
+                                                               'protocol',
+                                                               'http://autocafe.co.kr/ASSO/')
+                    if res:
+                        div.attrs['style'] = reg_exp_url.sub(f"url({file_name})", div.attrs['style'])
+                        protocol_image += 1
     with open(f'{path}/add.html', "wb") as f_output:
         f_output.write(soap.prettify("utf-8"))
 
@@ -262,7 +295,7 @@ def process_additional_data(content, session, path):
     for image in images:
         if 'alt' not in image.attrs and (
                 'onerror' in image.attrs or ('style' in image.attrs and image.attrs['style'] == 'display:none;')):
-            get_and_write_file(image.attrs['src'], path, f'big_image_{image_count}.jpg', session)
+            get_and_write_file(image.attrs['src'], path, f'image_{image_count}.jpg', session, add_name_part='big')
             image_count = image_count + 1
     maps = soap.find_all('map', attrs={'name': 'carPoint'})
     for el in maps:
@@ -282,23 +315,19 @@ def process_car_data(object_car, path, session):
         os.mkdir(car_path)
         with open(f'{car_path}/car_data.json', 'w') as file:
             file.write(json.dumps(object_car))
-        header = {
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36',
-            'Accept': 'text / html, application / xhtml + xml, application / xml;     q = 0.9, image / avif, image / webp, image / apng, * / *;q = 0.8, application / signed - exchange;     v = b3;  q = 0.9',
-            'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7,ru;q=0.6',
-        }
         image_thb = object_car['CarImageThumb']
         if image_thb:
-            get_and_write_file(image_thb, car_path, f'ImageThumb.jpg', session)
+            get_and_write_file(image_thb, car_path, f'ImageThumb.jpg', session, add_name_part='')
         url = f'http://www.carmanager.co.kr/PopupFrame/CarDetail/{carno}'
-        data = get_and_write_file(url, car_path, f'detail.html', session)
+        data, file_name = get_and_write_file(url, car_path, f'detail.html', session, add_name_part='')
         if data:
             process_additional_data(data, session, car_path)
         for i in range(1, 6):
             key_name = f'CarMarkImageURL{i}'
             image_url = object_car[key_name]
             if image_url:
-                get_and_write_file(f'http://www.carmanager.co.kr/{image_url}', car_path, f'image_{i}.gif', session)
+                get_and_write_file(f'http://www.carmanager.co.kr/{image_url}', car_path, f'image_{i}.gif', session,
+                                   add_name_part='')
 
 
 def import_car_data(login, password, db_path='DataBase', max_page=1, per_page_count=10, region=103, area=1035,

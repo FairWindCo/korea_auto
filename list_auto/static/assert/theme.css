@@ -1,0 +1,84 @@
+.page_header {
+    padding: 15px 0;
+    border-bottom: solid 1px #dcdcdc;
+    background-color: #fff;
+}
+
+.page_header_logo-caption {
+    text-transform: uppercase;
+    font-size: .875em;
+    color: #333;
+    max-width: 5.3em;
+    padding-left: 1em;
+    border-left: solid 1px #d5d5d5;
+    margin-left: 1em;
+}
+
+.icon-svg {
+    display: inline-block;
+    width: 1.375em;
+    height: 1.375em;
+    fill: currentColor;
+    fill-rule: evenodd;
+    vertical-align: middle;
+}
+
+.phone-tel {
+    color: #234819;
+}
+
+.phone-life {
+    color: #dbba15;
+}
+
+.phone-vodafone {
+    color: #f91600;
+}
+
+.phone-kyivstar {
+    color: #00a0ff;
+}
+
+.d-none {
+    display: none!important;
+}
+
+.text-decoration-none {
+    text-decoration: none!important;
+}
+
+.text-gray {
+    color: #7b7b7b;
+}
+
+.text-alt-body {
+    color: #3f5157;
+}
+
+.col-my-flex {
+    flex: 0 0 auto;
+    width: auto;
+    max-width: 100%;
+}
+
+.place-items-center {
+    display: grid;
+    place-items: center;
+}
+
+.header_phone-list {
+    column-count: 2;
+    display: inline-block;
+}
+
+.phone-item {
+    break-inside: avoid;
+    padding: .3em 0;
+    display: flex;
+    align-items: center;
+}
+
+.phone-item a {
+    height: 1.375em;
+    margin-left: .3em;
+}

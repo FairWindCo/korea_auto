@@ -1,0 +1,167 @@
+{% extends 'vue_utils/base_template.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block css_header_extend %}
+    <link rel="stylesheet" href="{% static 'vue_utils/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'assert/theme.css' %}">
+{% endblock %}
+
+
+{% block body_content %}
+    <div class="header_top">
+        <div class="container">
+            <div class="row">
+                <div class="col">
+                    <div class="row">
+                        <div class="col-auto pr-0 header_office d-flex align-items-center">
+                            Представительство:
+                        </div>
+                        <div class="col-auto" style="width: 160px">
+
+                        </div>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="header-top__social-links d-flex align-items-center">
+                        <a href="https://t.me/plcua"
+                           class="header-top__social-link social-link__item social-link__item-telegram text-decoration-none"
+                           rel="noreferrer" target="_blank">
+                            <svg class="icon-svg">
+                                <use xlink:href="https://plc.ua/wp-content/themes/plc/public/svg/sprite.main.svg?1611830344#telegram"></use>
+                            </svg>
+                        </a>
+                        <a href="https://invite.viber.com/?g2=AQBVJ7tc3eOAkkpvzFCAmYfmAn3vhbB1i02bqyHrgCHw6d1p9piiDU7g56kEDjHj"
+                           class="header-top__social-link social-link__item social-link__item-viber text-decoration-none"
+                           rel="noreferrer" target="_blank">
+                            <svg class="icon-svg">
+                                <use xlink:href="https://plc.ua/wp-content/themes/plc/public/svg/sprite.main.svg?1611830344#viber"></use>
+                            </svg>
+                        </a>
+                        <a href="https://www.instagram.com/plc.ua/?hl=ru"
+                           class="header-top__social-link social-link__item social-link__item-instagram text-decoration-none"
+                           rel="noreferrer" target="_blank">
+                            <svg class="icon-svg">
+                                <use xlink:href="https://plc.ua/wp-content/themes/plc/public/svg/sprite.main.svg?1611830344#instagram"></use>
+                            </svg>
+                        </a>
+                        <a href="https://www.facebook.com/plc.com.ua/"
+                           class="header-top__social-link social-link__item social-link__item-facebook text-decoration-none"
+                           rel="noreferrer" target="_blank">
+                            <svg class="icon-svg">
+                                <use xlink:href="https://plc.ua/wp-content/themes/plc/public/svg/sprite.main.svg?1611830344#facebook"></use>
+                            </svg>
+                        </a>
+                        <a href="https://www.youtube.com/c/PLCGroup?sub_confirmation=1"
+                           class="header-top__social-link social-link__item social-link__item-youtube text-decoration-none"
+                           rel="noreferrer" target="_blank">
+                            <svg class="icon-svg">
+                                <use xlink:href="https://plc.ua/wp-content/themes/plc/public/svg/sprite.main.svg?1611830344#youtube"></use>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+                <div class="pl-0 col-auto header_office d-flex align-items-center">
+                    Язык сайта:
+                </div>
+                <div class="col-auto pl-0" style="height: 29px">
+                    <div class="plc_pll_the_lang">
+                        <div class="plc_pll_the_lang--current">
+                            <span class="plc_pll_the_lang--link"
+                                  style="background-image: url('https://plc.ua/wp-content/themes/plc/public/svg/sprite.flags.svg#ru')"></span>
+                        </div>
+                        <ul class="plc_pll_the_lang--list">
+                            <li class="plc_pll_the_lang--item">
+                                <a href="https://plc.ua/ua/" class="plc_pll_the_lang--link"
+                                   style="background-image: url('https://plc.ua/wp-content/themes/plc/public/svg/sprite.flags.svg#ua')"></a>
+                            </li>
+                            <li class="plc_pll_the_lang--item">
+                                <a href="https://plc.ua/en/" class="plc_pll_the_lang--link"
+                                   style="background-image: url('https://plc.ua/wp-content/themes/plc/public/svg/sprite.flags.svg#usa')"></a>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="page_header">
+        <div class="container">
+            <div class="row">
+                <div class="col page_header-logo-col">
+                    <a href="/" class="align-items-center d-inline-flex header-logo__link text-decoration-none"
+                       title="PLC Group">
+                        <img src="{% static 'logo.svg' %}" alt="KOREA Style" class="header_logo-img" width="121"
+                             height="85">
+                        <div class="page_header_logo-caption">
+                            Premium Luxury Cars
+                        </div>
+                    </a>
+                </div>
+                <div class="col-my-flex d-sm-none pr-0 place-items-center">
+                    <span class="btn btn-sm btn-primary" data-remodal-target="call2"></span>
+                </div>
+                <div class="col-my-flex header_phone-col place-items-center">
+                    <div class="header_phone-list">
+                        <div class="phone-item header_phone-0800">
+                            <svg class="phone-tel icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"
+                                 id="telephone">
+                                <path d="M256 0C114.624 0 0 114.624 0 256s114.624 256 256 256 256-114.624 256-256S397.376 0 256 0zm128 400c-149.984 0-272-122.016-272-272 0-8.832 7.168-16 16-16h59.072c8.832 0 16 7.168 16 16 0 27.648 6.016 53.984 17.888 78.24a15.84 15.84 0 01.736 12.256 15.921 15.921 0 01-8.16 9.184l-23.872 11.52c19.872 34.592 48.544 63.296 83.104 83.104l11.52-23.84c1.856-3.84 5.152-6.752 9.184-8.16 4.032-1.376 8.448-1.12 12.256.736 24.32 11.872 50.624 17.888 78.24 17.888 8.832 0 16 7.168 16 16V384H400c0 8.832-7.168 16-16 16z"></path>
+                            </svg>
+                            <a href="tel:0800215057" class="text-decoration-none">
+
+                                <span class="header_phone-code d-none"></span>
+                                <span class="header_phone-ope text-gray">0800</span>
+                                <span class="header_phone-num text-alt-body">215057</span>
+                            </a>
+                        </div>
+                        <div class="phone-item header_phone-life">
+                            <svg class="phone-life icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 70"
+                                 id="lifecell">
+                                <path d="M5.3 35C5.3 18 19 4.3 36 4.3S66.7 18 66.7 35 53 65.7 36 65.7c-3.4 0-6.6-.5-9.6-1.5 2.2-12.7 10.2-23 20.7-27.4 1.2 1.4 3.1 2.3 5.2 2.3 3.7 0 6.8-3 6.8-6.8s-3-6.8-6.8-6.8c-3.7 0-6.8 3-6.8 6.8-13.5 4.1-24.4 13.5-30 25.6-1.8-1.6-3.3-3.4-4.7-5.3.3-11.8 6.2-22.1 14.9-28.2 1.2 1.4 3.1 2.3 5.1 2.3 3.8 0 6.8-3 6.8-6.8s-3-6.8-6.8-6.8-6.8 3-6.8 6.8v.6C15.9 23.4 9.2 29 5.3 36.2V35"></path>
+                            </svg>
+                            <a href="tel:+380931705245" class="text-decoration-none">
+                                <span class="header_phone-code d-none">+38</span>
+                                <span class="header_phone-ope text-gray">093</span>
+                                <span class="header_phone-num text-alt-body">1705245</span>
+                            </a>
+                        </div>
+                        <div class="phone-item header_phone-vodafone">
+                            <svg class="phone-vodafone icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 70"
+                                 id="vodafone">
+                                <path d="M49.3 7.3c-5.6.8-10 6.1-10.1 12.5 7.8 1.4 13.7 6.7 13.7 16.1 0 9-7.5 16.3-16.9 16.3-9.3 0-16.9-8.2-16.9-18.8 0-14.6 13-26.8 29.5-26.4-3.9-1.7-8.1-2.7-12.6-2.7C19.1 4.3 5.3 18 5.3 35S19.1 65.7 36 65.7 66.7 52 66.7 35c0-12.2-7.1-22.7-17.4-27.7z"></path>
+                            </svg>
+                            <a href="tel:+380503949325" class="text-decoration-none">
+                                <span class="header_phone-code d-none">+38</span>
+                                <span class="header_phone-ope text-gray">050</span>
+                                <span class="header_phone-num text-alt-body">3949325</span>
+                            </a>
+                        </div>
+                        <div class="phone-item header_phone-kyivstar">
+                            <svg class="phone-kyivstar icon-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 72 70"
+                                 id="kyivstar">
+                                <g stroke-width="8" stroke-linecap="round">
+                                    <path d="M36 9v14.5M62.6 28.3l-13.8 4.5M52.5 59.7L44 48M19.5 59.7L28 48M9.4 28.3l13.8 4.5"></path>
+                                </g>
+                            </svg>
+
+                            <a href="tel:+380673260727" class="text-decoration-none">
+                                <span class="phone-code d-none">+38</span>
+                                <span class="phone-ope text-gray">067</span>
+                                <span class="phone-num text-alt-body">3260727</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-my-flex place-items-center">
+                <span class="btn btn-sm btn-secondary text-uppercase" data-remodal-target="callback">
+                    Позвоните мне                </span>
+                </div>
+                <div class="col-my-flex header_burger-lg place-items-center pl-0">
+                <span class="btn btn-sm btn-primary" data-remodal-target="menu">
+                    <svg class="icon-svg"><use xlink:href="{% static 'assert/sprite.flags.svg' %}#menu"></use></svg>                </span>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
