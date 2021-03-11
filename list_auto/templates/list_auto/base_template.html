@@ -1,0 +1,302 @@
+{% extends 'vue_utils/base_template.html' %}
+{% load static %}
+{% load i18n %}
+
+{% block css_header_extend %}
+    <link rel="stylesheet" href="{% static 'vue_utils/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'assert/theme.css' %}">
+{% endblock %}
+
+
+{% block body_content %}
+    <header>
+        <div class="d-none  page_top_bar d-md-block ">
+            <div class="container">
+                <div class="row">
+                    <div class="col">
+                        <div class="row">
+                            <div class="col-auto pr-0 top_bar_text d-flex align-items-center">
+                                Контакты:
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-sm-10 col-my-flex">
+                        <div class="header-top__social-links d-flex align-items-center">
+                            <div class="phone-item header_phone-phone">
+                                <svg class="icon-svg phone-tel" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                    <use xlink:href="{% static 'assert/sprite.links.svg' %}#telephone"
+                                         href="{% static 'assert/sprite.links.svg' %}#telephone">
+                                    </use>
+                                </svg>
+                                <a href="tel:+38050XXXXXXX" class="text-decoration-none">
+                                    <span class="header_phone-code d-none">+38</span>
+                                    <span class="header_phone-ope text-gray">050</span>
+                                    <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
+                                </a>
+                            </div>
+                            <div class="phone-item header_phone-vodafone">
+                                <svg class="icon-svg phone-vodafone" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                    <use xlink:href="{% static 'assert/sprite.links.svg' %}#vodafone"
+                                         href="{% static 'assert/sprite.links.svg' %}#vodafone">
+                                    </use>
+                                </svg>
+                                <a href="tel:+38050XXXXXXX" class="text-decoration-none">
+                                    <span class="header_phone-code d-none">+38</span>
+                                    <span class="header_phone-ope text-gray">050</span>
+                                    <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
+                                </a>
+                            </div>
+                            <div class="phone-item header_phone-life">
+                                <svg class="icon-svg phone-life" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                    <use xlink:href="{% static 'assert/sprite.links.svg' %}#lifecell"
+                                         href="{% static 'assert/sprite.links.svg' %}#lifecell">
+                                    </use>
+                                </svg>
+                                <a href="tel:+38050XXXXXXX" class="text-decoration-none">
+                                    <span class="header_phone-code d-none">+38</span>
+                                    <span class="header_phone-ope text-gray">093</span>
+                                    <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
+                                </a>
+                            </div>
+                            <div class="phone-item header_phone-kyivstar">
+                                <svg class="icon-svg phone-kyivstar" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                    <use xlink:href="{% static 'assert/sprite.links.svg' %}#kyivstar"
+                                         href="{% static 'assert/sprite.links.svg' %}#kyivstar">
+                                    </use>
+                                </svg>
+                                <a href="tel:+38050XXXXXXX" class="text-decoration-none">
+                                    <span class="header_phone-code d-none">+38</span>
+                                    <span class="header_phone-ope text-gray">067</span>
+                                    <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-my-flex place-items-center">
+                        <div class="header-top__social-links d-flex align-items-center">
+                            <a href="https://t.me/plcua"
+                               class="top_panel__social-link social-link__item link__telegram text-decoration-none"
+                               rel="noreferrer" target="_blank">
+                                <svg class="icon-svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                    <use xlink:href="{% static 'assert/sprite.links.svg' %}#telegram"
+                                         href="{% static 'assert/sprite.links.svg' %}#telegram">
+                                    </use>
+                                </svg>
+                            </a>
+                            <a href="https://invite.viber.com/?g2=#"
+                               class="top_panel__social-link social-link__item social-link__item-viber text-decoration-none"
+                               rel="noreferrer" target="_blank">
+                                <svg class="icon-svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                    <use xlink:href="{% static 'assert/sprite.links.svg' %}#viber"
+                                         href="{% static 'assert/sprite.links.svg' %}#viber">
+                                    </use>
+                                </svg>
+                            </a>
+                            <a href="https://www.instagram.com/plc.ua/?hl=ru"
+                               class="top_panel__social-link social-link__item social-link__item-instagram text-decoration-none"
+                               rel="noreferrer" target="_blank">
+                                <svg class="icon-svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                    <use xlink:href="{% static 'assert/sprite.links.svg' %}#instagram"
+                                         href="{% static 'assert/sprite.links.svg' %}#instagram">
+                                    </use>
+                                </svg>
+                            </a>
+                            <a href="https://www.facebook.com/plc.com.ua/"
+                               class="top_panel__social-link social-link__item social-link__item-facebook text-decoration-none"
+                               rel="noreferrer" target="_blank">
+                                <svg class="icon-svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                    <use xlink:href="{% static 'assert/sprite.links.svg' %}#facebook"
+                                         href="{% static 'assert/sprite.links.svg' %}#facebook">
+                                    </use>
+                                </svg>
+                            </a>
+                            <a href="https://www.youtube.com/c/PLCGroup?sub_confirmation=1"
+                               class="top_panel__social-link social-link__item social-link__item-youtube text-decoration-none"
+                               rel="noreferrer" target="_blank">
+                                <svg class="icon-svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                    <use xlink:href="{% static 'assert/sprite.links.svg' %}#youtube"
+                                         href="{% static 'assert/sprite.links.svg' %}#youtube">
+                                    </use>
+                                </svg>
+                            </a>
+                        </div>
+                    </div>
+                    <div class="pl-0 col-my-flex top_bar_text d-flex align-items-center">
+                        Язык сайта:
+                    </div>
+                    <div class="col-my-flex pl-0" style="height: 29px">
+                        <div class="top_panel_lang_selector">
+                            <div class="plc_pll_the_lang--current">
+                            <span class="top_panel_lang_selector__link"
+                                  style="background-image: url('{% static 'assert/sprite.flags.svg' %}#ru')"></span>
+                            </div>
+                            <ul class="top_panel_lang_selector__list">
+                                <li class="top_panel_lang_selector__item">
+                                    <a href="https://plc.ua/ua/" class="top_panel_lang_selector__link"
+                                       style="background-image: url('{% static 'assert/sprite.flags.svg' %}#ua')"></a>
+                                </li>
+                                <li class="top_panel_lang_selector__item">
+                                    <a href="https://plc.ua/en/" class="top_panel_lang_selector__link"
+                                       style="background-image: url('{% static 'assert/sprite.flags.svg' %}#usa')"></a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="page_header">
+            <div class="container">
+                <div class="row">
+                    <div class="col-3 col-sm-12 col-md-3 page_header-logo-col">
+                        <a href="/" class="align-items-center d-inline-flex header-logo__link text-decoration-none"
+                           title="PLC Group">
+                            <img src="{% static 'logo.svg' %}" alt="KOREA Style" class="header_logo-img d-none d-md-block" width="121"
+                                 height="85">
+                            <div class="page_header_logo-caption header_panel_left_divider">
+                                Premium Luxury Cars
+                            </div>
+                        </a>
+                    </div>
+                    <div class="col-9 align-items-center">
+                        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+                            <div class="container-fluid">
+                                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                                        aria-expanded="false" aria-label="Toggle navigation">
+                                    <span class="navbar-toggler-icon"></span>
+                                </button>
+                                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                                        <li class="nav-item">
+                                            <a class="nav-link active" aria-current="page" href="#">Home</a>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link" href="#">Link</a>
+                                        </li>
+                                        <li class="nav-item dropdown">
+                                            <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown"
+                                               role="button"
+                                               data-bs-toggle="dropdown" aria-expanded="false">
+                                                Dropdown
+                                            </a>
+                                            <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
+                                                <li><a class="dropdown-item" href="#">Action</a></li>
+                                                <li><a class="dropdown-item" href="#">Another action</a></li>
+                                                <li>
+                                                    <hr class="dropdown-divider">
+                                                </li>
+                                                <li><a class="dropdown-item" href="#">Something else here</a></li>
+                                            </ul>
+                                        </li>
+                                        <li class="nav-item">
+                                            <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
+                                        </li>
+                                    </ul>
+                                    <form class="d-flex">
+                                        <input class="form-control me-2" type="search" placeholder="Search"
+                                               aria-label="Search">
+                                        <button class="btn btn-primary" type="submit">Search</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </nav>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+    <main>
+        {% block main_content_block %}
+        {% endblock %}
+    </main>
+    <footer>
+        <div class="page_footer">
+            <div class="container">
+                <div class="row">
+                    <div class="col-my-flex header_phone-col place-items-center header_panel_left_divider">
+                        <div class="header_phone-list">
+                            <div class="phone-item header_phone-0800">
+                                <svg class="icon-svg phone-tel" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                    <use xlink:href="{% static 'assert/sprite.links.svg' %}#telephone"
+                                         href="{% static 'assert/sprite.links.svg' %}#telephone">
+                                    </use>
+                                </svg>
+                                <a href="tel:+38050XXXXXXX" class="text-decoration-none">
+                                    <span class="header_phone-code d-none">+38</span>
+                                    <span class="header_phone-ope text-gray">093</span>
+                                    <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
+                                </a>
+                            </div>
+                            <div class="phone-item header_phone-life">
+                                <svg class="icon-svg phone-life" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                    <use xlink:href="{% static 'assert/sprite.links.svg' %}#lifecell"
+                                         href="{% static 'assert/sprite.links.svg' %}#lifecell">
+                                    </use>
+                                </svg>
+                                <a href="tel:+38050XXXXXXX" class="text-decoration-none">
+                                    <span class="header_phone-code d-none">+38</span>
+                                    <span class="header_phone-ope text-gray">093</span>
+                                    <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
+                                </a>
+                            </div>
+                            <div class="phone-item header_phone-vodafone">
+                                <svg class="icon-svg phone-vodafone" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                    <use xlink:href="{% static 'assert/sprite.links.svg' %}#vodafone"
+                                         href="{% static 'assert/sprite.links.svg' %}#vodafone">
+                                    </use>
+                                </svg>
+                                <a href="tel:+38050XXXXXXX" class="text-decoration-none">
+                                    <span class="header_phone-code d-none">+38</span>
+                                    <span class="header_phone-ope text-gray">050</span>
+                                    <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
+                                </a>
+                            </div>
+                            <div class="phone-item header_phone-kyivstar">
+                                <svg class="icon-svg phone-kyivstar" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                    <use xlink:href="{% static 'assert/sprite.links.svg' %}#kyivstar"
+                                         href="{% static 'assert/sprite.links.svg' %}#kyivstar">
+                                    </use>
+                                </svg>
+                                <a href="tel:+38050XXXXXXX" class="text-decoration-none">
+                                    <span class="header_phone-code d-none">+38</span>
+                                    <span class="header_phone-ope text-gray">067</span>
+                                    <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-my-flex place-items-center">
+                <span class="btn btn-sm btn-primary text-uppercase" data-remodal-target="callback">
+                    Позвоните мне                </span>
+                    </div>
+
+                </div>
+            </div>
+            <div class="footer_copyright py-3">
+                <div class="container">
+                    <div class="row">
+                        <div class="col-5">
+                            KOREA Style - © 2021. Все права защищены
+                        </div>
+                        <div class="col">
+                            <ul class="footer_desc_nav-list justify-content-between row no-gutters p-0 mb-0 list-unstyled">
+                                <li id="menu-item-15"
+                                    class="menu-item menu-item-type-custom menu-item-object-custom menu-item-15"><a>Политика
+                                    конфиденциальности</a></li>
+                                <li id="menu-item-16"
+                                    class="menu-item menu-item-type-custom menu-item-object-custom menu-item-16"><a>Публичный
+                                    договор (ОФЕРТА)</a></li>
+                                <li id="menu-item-17"
+                                    class="menu-item menu-item-type-custom menu-item-object-custom menu-item-17"><a>Предупреждение</a>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+{% endblock %}

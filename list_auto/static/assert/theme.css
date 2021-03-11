@@ -1,3 +1,11 @@
+.btn {
+    color: #4288b9;
+    border: 1px solid #4288b9;
+}
+.btn-primary:hover {
+    background-color: #4288b9;
+}
+
 svg {
     height: 100px;
     width: 100px;
@@ -107,10 +115,6 @@ svg {
     color: #00a0ff;
 }
 
-.d-none {
-    display: none !important;
-}
-
 .text-decoration-none {
     text-decoration: none !important;
 }
@@ -150,7 +154,10 @@ svg {
     height: 1.375em;
     margin-left: .3em;
 }
-
+.dollar{
+    width: 1em;
+    color: #86e086;
+}
 
 .page_top_bar {
     height: 36px;
@@ -174,6 +181,70 @@ svg {
 .list-unstyled {
     list-style: none;
 }
-.navbar {
-    position: inherit;
+
+.col-my-flex-shrink {
+    flex-shrink: 2;
+    flex-grow: 1;
+    flex-basis: 80%;
+    width: 80%;
+}
+
+@media (min-width: 992px) {
+    .navbar {
+        position: inherit;
+    }
+}
+
+.car_select_form {
+    margin-top: 15px;
+    margin-bottom: 15px;
+    position: relative;
+    box-shadow: 0 0 45px rgb(34 159 255 / 30%);
+    background-color: #d9dde3;
+}
+
+.car_select_form {
+    padding: 10px 0;
+}
+
+.car_select_form img {
+    width: 280px;
+    position: absolute;
+    left: -50px;
+    bottom: 10px;
+    filter: url(#drop-shadow);
+    -ms-filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=15, Color='#999')";
+    filter: "progid:DXImageTransform.Microsoft.Dropshadow(OffX=0, OffY=15, Color='#999')";
+    -webkit-filter: drop-shadow(0px 15px 15px rgba(0, 0, 0, 0.9));
+}
+
+.hot_propose {
+    color: white;
+    margin-top: 25px;
+    margin-bottom: 15px;
+}
+
+.hot_propose h4 {
+    text-align: center;
+}
+
+.hot_propose img {
+    max-width: 100%;
+}
+
+.car_propose {
+    border: 1px solid #1e1e2d;
+    border-radius: 3%;
+}
+.navbar-collapse.show {
+    padding: 5px;
+    background-color: #f8f9fa;
+}
+
+.m-n1 {
+  margin: -0.25rem !important;
+}
+
+.m-n2 {
+  margin: -0.5rem !important;
 }

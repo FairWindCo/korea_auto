@@ -1,5 +1,6 @@
-{% extends 'vue_utils/base_template.html' %}
+{% extends 'list_auto/base_template.html' %}
 {% load static %}
+{% load humanize %}
 {% load i18n %}
 
 {% block css_header_extend %}
@@ -8,299 +9,232 @@
 {% endblock %}
 
 
-{% block body_content %}
-    <div class="page_top_bar">
-        <div class="container">
+{% block main_content_block %}
+    <section>
+        <div class="container car_select_form">
             <div class="row">
-                <div class="col">
-                    <div class="row">
-                        <div class="col-auto pr-0 top_bar_text d-flex align-items-center">
-                            Контакты:
-                        </div>
-                    </div>
+                <div class="col-12 clearfix text-center"><h3>Быстрый подбор авто</h3></div>
+                <div class="col-3 d-none d-md-block">
+                    <img class="col-my-flex-shrink" src="{% static 'assert/KOREAStyle_1.png' %}">
                 </div>
-                <div class="col-my-flex">
-                    <div class="header-top__social-links d-flex align-items-center">
-                        <div class="phone-item header_phone-phone">
-                            <svg class="icon-svg phone-tel" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <use xlink:href="{% static 'assert/sprite.links.svg' %}#telephone"
-                                     href="{% static 'assert/sprite.links.svg' %}#telephone">
-                                </use>
-                            </svg>
-                            <a href="tel:+38050XXXXXXX" class="text-decoration-none">
-                                <span class="header_phone-code d-none">+38</span>
-                                <span class="header_phone-ope text-gray">050</span>
-                                <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
-                            </a>
+                <div class="col-md-9 col-sm-12">
+                    <form action="" method="post">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="row">
+                                        <div class="col-12"><label
+                                                class="main__form-label">Кузов</label></div>
+                                        <div class="col-12">
+                                                                <span class="form-control-wrap car_type"><select
+                                                                        data-select2-theme="plc" name="car_type"
+                                                                        class="form-control select w-100 styled-select s2 select2-hidden-accessible"
+                                                                        aria-invalid="false" data-select2-id="3"
+                                                                        tabindex="-1" aria-hidden="true"><option
+                                                                        value="Любой" data-select2-id="5">Любой</option><option
+                                                                        value="Седан">Седан</option><option
+                                                                        value="Внедорожник">Внедорожник</option><option
+                                                                        value="Хэтчбек">Хэтчбек</option><option
+                                                                        value="Универсал">Универсал</option><option
+                                                                        value="Купе">Купе</option><option
+                                                                        value="Минивэн">Минивэн</option><option
+                                                                        value="Пикап">Пикап</option></select><span
+                                                                        class="select2 select2-container select2-container--plc"
+                                                                        dir="ltr" data-select2-id="4"
+                                                                        style="width: 100%;"><span
+                                                                        class="selection"><span
+                                                                        class="select2-selection select2-selection--single"
+                                                                        role="combobox" aria-haspopup="true"
+                                                                        aria-expanded="false" tabindex="0"
+                                                                        aria-disabled="false"
+                                                                        aria-labelledby="select2-car_type-qo-container"><span
+                                                                        class="select2-selection__rendered"
+                                                                        id="select2-car_type-qo-container"
+                                                                        role="textbox" aria-readonly="true"
+                                                                        title="Любой">Любой</span><span
+                                                                        class="select2-selection__arrow"
+                                                                        role="presentation"><b role="presentation"></b></span></span></span><span
+                                                                        class="dropdown-wrapper"
+                                                                        aria-hidden="true"></span></span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="row">
+                                        <div class="col-12"><label
+                                                class="main__form-label inputs__label">Год
+                                            выпуска</label></div>
+                                        <div class="col-6">
+                                                                <span class="form-control-wrap car_year_from"><input
+                                                                        type="number" name="car_year_from" value="2012"
+                                                                        class="form-control number validates-as-number input_year text-center"
+                                                                        id="selection_car_from" min="1990" max="2021"
+                                                                        aria-invalid="false"></span>
+                                        </div>
+                                        <div class="col-6">
+                                                                <span class="form-control-wrap car_year_to"><input
+                                                                        type="number" name="car_year_to" value="2019"
+                                                                        class="form-control number validates-as-number input_year text-center"
+                                                                        id="selection_car_to" min="1990" max="2021"
+                                                                        aria-invalid="false"></span>
+                                        </div>
+                                        <div class="col-12 mt-n1">
+                                            <div data-nouislider-range="" data-step="1"
+                                                 data-min-target="#selection_car_from"
+                                                 data-max-target="#selection_car_to"
+                                                 class="noUi-target noUi-ltr noUi-horizontal noUi-txt-dir-ltr">
+                                                <div class="noUi-base">
+                                                    <div class="noUi-connects">
+                                                        <div class="noUi-connect"
+                                                             style="transform: translate(70.9677%, 0px) scale(0.225806, 1);"></div>
+                                                    </div>
+                                                    <div class="noUi-origin"
+                                                         style="transform: translate(-290.323%, 0px); z-index: 5;">
+                                                        <div class="noUi-handle noUi-handle-lower"
+                                                             data-handle="0" tabindex="0"
+                                                             role="slider"
+                                                             aria-orientation="horizontal"
+                                                             aria-valuemin="1990.0"
+                                                             aria-valuemax="2019.0"
+                                                             aria-valuenow="2012.0"
+                                                             aria-valuetext="2012">
+                                                            <div class="noUi-touch-area"></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="noUi-origin"
+                                                         style="transform: translate(-64.5161%, 0px); z-index: 4;">
+                                                        <div class="noUi-handle noUi-handle-upper"
+                                                             data-handle="1" tabindex="0"
+                                                             role="slider"
+                                                             aria-orientation="horizontal"
+                                                             aria-valuemin="2012.0"
+                                                             aria-valuemax="2021.0"
+                                                             aria-valuenow="2019.0"
+                                                             aria-valuetext="2019">
+                                                            <div class="noUi-touch-area"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="row">
+                                        <div class="col-12"><label
+                                                class="main__form-label inputs__label">Стоимость,
+                                            $</label></div>
+                                        <div class="col-6">
+                                                                <span class="form-control-wrap car_price_from"><input
+                                                                        type="number" name="car_price_from" value="0"
+                                                                        class="form-control number validates-as-number input_price text-center"
+                                                                        id="selection_car_price_from" min="0"
+                                                                        max="30000" aria-invalid="false"></span>
+                                        </div>
+                                        <div class="col-6">
+                                                                <span class="form-control-wrap car_price_to"><input
+                                                                        type="number" name="car_price_to" value="12000"
+                                                                        class="form-control number validates-as-number input_price text-center"
+                                                                        id="selection_car_price_to" min="3000"
+                                                                        max="30000" aria-invalid="false"></span>
+                                        </div>
+                                        <div class="col-12 mt-n1">
+                                            <div data-nouislider-range="" data-step="1"
+                                                 data-min-target="#selection_car_price_from"
+                                                 data-max-target="#selection_car_price_to"
+                                                 class="noUi-target noUi-ltr noUi-horizontal noUi-txt-dir-ltr">
+                                                <div class="noUi-base">
+                                                    <div class="noUi-connects">
+                                                        <div class="noUi-connect"
+                                                             style="transform: translate(0%, 0px) scale(0.4, 1);"></div>
+                                                    </div>
+                                                    <div class="noUi-origin"
+                                                         style="transform: translate(-1000%, 0px); z-index: 5;">
+                                                        <div class="noUi-handle noUi-handle-lower"
+                                                             data-handle="0" tabindex="0"
+                                                             role="slider"
+                                                             aria-orientation="horizontal"
+                                                             aria-valuemin="0.0"
+                                                             aria-valuemax="12000.0"
+                                                             aria-valuenow="0.0" aria-valuetext="0">
+                                                            <div class="noUi-touch-area"></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="noUi-origin"
+                                                         style="transform: translate(-600%, 0px); z-index: 6;">
+                                                        <div class="noUi-handle noUi-handle-upper"
+                                                             data-handle="1" tabindex="0"
+                                                             role="slider"
+                                                             aria-orientation="horizontal"
+                                                             aria-valuemin="0.0"
+                                                             aria-valuemax="30000.0"
+                                                             aria-valuenow="12000.0"
+                                                             aria-valuetext="12000">
+                                                            <div class="noUi-touch-area"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <label class="main__form-label">Ваше имя<span class="required"
+                                                                                  title="обязательно">*</span></label>
+                                    <span class="form-control-wrap user_name"><input
+                                            type="text" name="user_name" value="" size="40"
+                                            class="form-control text validates-as-required w-100"
+                                            aria-required="true" aria-invalid="false"
+                                            placeholder="Имя"></span>
+                                </div>
+                                <div class="col-lg-4">
+                                    <label class="main__form-label">Ваш телефон<span
+                                            class="required" title="обязательно">*</span></label>
+                                    <span class="form-control-wrap user_phone"><input
+                                            type="tel" name="user_phone" value="" size="40"
+                                            class="form-control text tel validates-as-required validates-as-tel w-100"
+                                            aria-required="true" aria-invalid="false"
+                                            placeholder="+38 (___) ___-__-__" maxlength="19"></span>
+                                </div>
+                                <div class="col-lg-4">
+                                    <label class="main__form-label">&nbsp;</label> <input
+                                        type="submit" value="Подобрать"
+                                        class="form-control submit btn btn-primary w-100"><span
+                                        class="ajax-loader"></span>
+                                </div>
+                            </div>
                         </div>
-                        <div class="phone-item header_phone-vodafone">
-                            <svg class="icon-svg phone-vodafone" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <use xlink:href="{% static 'assert/sprite.links.svg' %}#vodafone"
-                                     href="{% static 'assert/sprite.links.svg' %}#vodafone">
-                                </use>
-                            </svg>
-                            <a href="tel:+38050XXXXXXX" class="text-decoration-none">
-                                <span class="header_phone-code d-none">+38</span>
-                                <span class="header_phone-ope text-gray">050</span>
-                                <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
-                            </a>
-                        </div>
-                        <div class="phone-item header_phone-life">
-                            <svg class="icon-svg phone-life" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <use xlink:href="{% static 'assert/sprite.links.svg' %}#lifecell"
-                                     href="{% static 'assert/sprite.links.svg' %}#lifecell">
-                                </use>
-                            </svg>
-                            <a href="tel:+38050XXXXXXX" class="text-decoration-none">
-                                <span class="header_phone-code d-none">+38</span>
-                                <span class="header_phone-ope text-gray">093</span>
-                                <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
-                            </a>
-                        </div>
-                        <div class="phone-item header_phone-kyivstar">
-                            <svg class="icon-svg phone-kyivstar" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <use xlink:href="{% static 'assert/sprite.links.svg' %}#kyivstar"
-                                     href="{% static 'assert/sprite.links.svg' %}#kyivstar">
-                                </use>
-                            </svg>
-                            <a href="tel:+38050XXXXXXX" class="text-decoration-none">
-                                <span class="header_phone-code d-none">+38</span>
-                                <span class="header_phone-ope text-gray">067</span>
-                                <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
-                            </a>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-my-flex place-items-center">
-                    <div class="header-top__social-links d-flex align-items-center">
-                        <a href="https://t.me/plcua"
-                           class="top_panel__social-link social-link__item link__telegram text-decoration-none"
-                           rel="noreferrer" target="_blank">
-                            <svg class="icon-svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <use xlink:href="{% static 'assert/sprite.links.svg' %}#telegram"
-                                     href="{% static 'assert/sprite.links.svg' %}#telegram">
-                                </use>
-                            </svg>
-                        </a>
-                        <a href="https://invite.viber.com/?g2=#"
-                           class="top_panel__social-link social-link__item social-link__item-viber text-decoration-none"
-                           rel="noreferrer" target="_blank">
-                            <svg class="icon-svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <use xlink:href="{% static 'assert/sprite.links.svg' %}#viber"
-                                     href="{% static 'assert/sprite.links.svg' %}#viber">
-                                </use>
-                            </svg>
-                        </a>
-                        <a href="https://www.instagram.com/plc.ua/?hl=ru"
-                           class="top_panel__social-link social-link__item social-link__item-instagram text-decoration-none"
-                           rel="noreferrer" target="_blank">
-                            <svg class="icon-svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <use xlink:href="{% static 'assert/sprite.links.svg' %}#instagram"
-                                     href="{% static 'assert/sprite.links.svg' %}#instagram">
-                                </use>
-                            </svg>
-                        </a>
-                        <a href="https://www.facebook.com/plc.com.ua/"
-                           class="top_panel__social-link social-link__item social-link__item-facebook text-decoration-none"
-                           rel="noreferrer" target="_blank">
-                            <svg class="icon-svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <use xlink:href="{% static 'assert/sprite.links.svg' %}#telegram"
-                                     href="{% static 'assert/sprite.links.svg' %}#telegram">
-                                </use>
-                            </svg>
-                        </a>
-                        <a href="https://www.youtube.com/c/PLCGroup?sub_confirmation=1"
-                           class="top_panel__social-link social-link__item social-link__item-youtube text-decoration-none"
-                           rel="noreferrer" target="_blank">
-                            <svg class="icon-svg" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <use xlink:href="{% static 'assert/sprite.links.svg' %}#telegram"
-                                     href="{% static 'assert/sprite.links.svg' %}#telegram">
-                                </use>
-                            </svg>
-                        </a>
-                    </div>
-                </div>
-                <div class="pl-0 col-my-flex top_bar_text d-flex align-items-center">
-                    Язык сайта:
-                </div>
-                <div class="col-my-flex pl-0" style="height: 29px">
-                    <div class="top_panel_lang_selector">
-                        <div class="plc_pll_the_lang--current">
-                            <span class="top_panel_lang_selector__link"
-                                  style="background-image: url('{% static 'assert/sprite.flags.svg' %}#ru')"></span>
-                        </div>
-                        <ul class="top_panel_lang_selector__list">
-                            <li class="top_panel_lang_selector__item">
-                                <a href="https://plc.ua/ua/" class="top_panel_lang_selector__link"
-                                   style="background-image: url('{% static 'assert/sprite.flags.svg' %}#ua')"></a>
-                            </li>
-                            <li class="top_panel_lang_selector__item">
-                                <a href="https://plc.ua/en/" class="top_panel_lang_selector__link"
-                                   style="background-image: url('{% static 'assert/sprite.flags.svg' %}#usa')"></a>
-                            </li>
-                        </ul>
-                    </div>
+                        <div class="response-output" aria-hidden="true"></div>
+                    </form>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="page_header">
+    </section>
+    <section class="hot_propose">
         <div class="container">
-            <div class="row">
-                <div class="col page_header-logo-col">
-                    <a href="/" class="align-items-center d-inline-flex header-logo__link text-decoration-none"
-                       title="PLC Group">
-                        <img src="{% static 'logo.svg' %}" alt="KOREA Style" class="header_logo-img" width="121"
-                             height="85">
-                        <div class="page_header_logo-caption header_panel_left_divider">
-                            Premium Luxury Cars
+            <h4>Горячие предложения</h4>
+            <div class="row align-items-center justify-content-center">
+                {% for car in car_list %}
+                    <div class="m-1 col-sm-12 col-md-3 d-flex flex-column bd-highlight car_propose">
+                        <div class="p-3 bd-highlight align-self-center text-center">{{ car.model_version }}</div>
+                        <div class="m-n2 p-0 bd-highlight">
+                            <img src="{% get_media_prefix %}/{{ car.car_code }}/ImageThumb.jpg">
                         </div>
-                    </a>
-                </div>
-                <div class="col-my-flex">
-                    <div class="container">
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-  <div class="container-fluid">
-                    <div class="col page_header-logo-col">
-                    <a href="/" class="align-items-center d-inline-flex header-logo__link text-decoration-none"
-                       title="PLC Group">
-                        <img src="{% static 'logo.svg' %}" alt="KOREA Style" class="header_logo-img" width="121"
-                             height="85">
-                        <div class="page_header_logo-caption header_panel_left_divider">
-                            Premium Luxury Cars
+                        <div class="p-3 bd-highlight align-self-center">
+                            <svg class="icon-svg dollar" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                <use xlink:href="{% static 'assert/dollars_money.svg' %}#dollars"
+                                     href="{% static 'assert/dollars_money.svg' %}#dollars">
+                                </use>
+                            </svg>
+                            {{ car.get_price|intcomma }} ₩
                         </div>
-                    </a>
-                </div>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <li class="nav-item">
-          <a class="nav-link active" aria-current="page" href="#">Home</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="#">Link</a>
-        </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Dropdown
-          </a>
-          <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-            <li><a class="dropdown-item" href="#">Action</a></li>
-            <li><a class="dropdown-item" href="#">Another action</a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item" href="#">Something else here</a></li>
-          </ul>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-        </li>
-      </ul>
-      <form class="d-flex">
-        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-        <button class="btn btn-outline-success" type="submit">Search</button>
-      </form>
-    </div>
-  </div>
-</nav>
-                </div>
+                        <div class="p-2 bd-highlight align-self-center">
+                            <button class="btn btn-primary">Детально</button>
 
-                </div>
-                <div class="col-my-flex header_burger-lg place-items-center pl-0">
-                <span class="btn btn-sm btn-primary" data-remodal-target="menu">
-                    <svg class="icon-svg"><use xlink:href="{% static 'assert/sprite.flags.svg' %}#menu"></use></svg>                </span>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div class="page_footer">
-        <div class="container">
-            <div class="row">
-                <div class="col-my-flex d-sm-none pr-0 place-items-center">
-                    <span class="btn btn-sm btn-primary" data-remodal-target="call2"></span>
-                </div>
-                <div class="col-my-flex header_phone-col place-items-center header_panel_left_divider">
-                    <div class="header_phone-list">
-                        <div class="phone-item header_phone-0800">
-                            <svg class="icon-svg phone-tel" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <use xlink:href="{% static 'assert/sprite.links.svg' %}#telephone"
-                                     href="{% static 'assert/sprite.links.svg' %}#telephone">
-                                </use>
-                            </svg>
-                            <a href="tel:+38050XXXXXXX" class="text-decoration-none">
-                                <span class="header_phone-code d-none">+38</span>
-                                <span class="header_phone-ope text-gray">093</span>
-                                <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
-                            </a>
-                        </div>
-                        <div class="phone-item header_phone-life">
-                            <svg class="icon-svg phone-life" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <use xlink:href="{% static 'assert/sprite.links.svg' %}#lifecell"
-                                     href="{% static 'assert/sprite.links.svg' %}#lifecell">
-                                </use>
-                            </svg>
-                            <a href="tel:+38050XXXXXXX" class="text-decoration-none">
-                                <span class="header_phone-code d-none">+38</span>
-                                <span class="header_phone-ope text-gray">093</span>
-                                <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
-                            </a>
-                        </div>
-                        <div class="phone-item header_phone-vodafone">
-                            <svg class="icon-svg phone-vodafone" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <use xlink:href="{% static 'assert/sprite.links.svg' %}#vodafone"
-                                     href="{% static 'assert/sprite.links.svg' %}#vodafone">
-                                </use>
-                            </svg>
-                            <a href="tel:+38050XXXXXXX" class="text-decoration-none">
-                                <span class="header_phone-code d-none">+38</span>
-                                <span class="header_phone-ope text-gray">050</span>
-                                <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
-                            </a>
-                        </div>
-                        <div class="phone-item header_phone-kyivstar">
-                            <svg class="icon-svg phone-kyivstar" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                <use xlink:href="{% static 'assert/sprite.links.svg' %}#kyivstar"
-                                     href="{% static 'assert/sprite.links.svg' %}#kyivstar">
-                                </use>
-                            </svg>
-                            <a href="tel:+38050XXXXXXX" class="text-decoration-none">
-                                <span class="header_phone-code d-none">+38</span>
-                                <span class="header_phone-ope text-gray">067</span>
-                                <span class="header_phone-num text-alt-body">XXX-XX-XX</span>
-                            </a>
                         </div>
                     </div>
-                </div>
-                <div class="col-my-flex place-items-center">
-                <span class="btn btn-sm btn-secondary text-uppercase" data-remodal-target="callback">
-                    Позвоните мне                </span>
-                </div>
-
+                {% endfor %}
             </div>
         </div>
-        <div class="footer_copyright py-3">
-            <div class="container">
-                <div class="row">
-                    <div class="col-5">
-                        KOREA Style - © 2021. Все права защищены
-                    </div>
-                    <div class="col">
-                        <ul class="footer_desc_nav-list justify-content-between row no-gutters p-0 mb-0 list-unstyled">
-                            <li id="menu-item-15"
-                                class="menu-item menu-item-type-custom menu-item-object-custom menu-item-15"><a>Политика
-                                конфиденциальности</a></li>
-                            <li id="menu-item-16"
-                                class="menu-item menu-item-type-custom menu-item-object-custom menu-item-16"><a>Публичный
-                                договор (ОФЕРТА)</a></li>
-                            <li id="menu-item-17"
-                                class="menu-item menu-item-type-custom menu-item-object-custom menu-item-17"><a>Предупреждение</a>
-                            </li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+    </section>
 {% endblock %}

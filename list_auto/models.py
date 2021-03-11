@@ -127,3 +127,6 @@ class Car(models.Model):
 
     def __str__(self):
         return f'[{self.car_code}] {self.model_version}'
+
+    def get_price(self):
+        return (self.price if self.price>0 else self.price_dealer) * 1000
