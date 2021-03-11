@@ -1,7 +1,75 @@
+svg {
+    height: 100px;
+    width: 100px;
+    cursor: pointer;
+    fill: #063b45;
+}
+
 .page_header {
     padding: 15px 0;
     border-bottom: solid 1px #dcdcdc;
     background-color: #fff;
+}
+
+.page_footer {
+    border-top: solid 1px #dcdcdc;
+    background-color: #062c45;
+    padding-bottom: 0;
+    padding-top: 15px;
+}
+
+.top_bar_text {
+    color: #3f5157;
+    font-size: .875em;
+}
+
+.top_panel_lang_selector {
+    position: relative;
+    padding: 4px;
+    border: solid 1px #dcdcdc;
+    border-radius: 3px;
+    background: #f8f8f8;
+    cursor: pointer;
+}
+
+.top_panel_lang_selector__list {
+    display: none;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    z-index: 5;
+}
+
+.top_panel_lang_selector__item {
+    margin-top: 7px;
+}
+
+.top_panel_lang_selector__link {
+    border: solid 1px transparent;
+    width: 1.6em;
+    padding-bottom: 50%;
+    display: block;
+    overflow: hidden;
+    line-height: 0;
+    background: transparent no-repeat 50% 50%;
+    background-size: cover;
+    text-decoration: none;
+}
+
+
+.top_panel__social-link.link__telegram:hover {
+    color: #0d3c61;
+}
+
+.page_top_bar .phone-item {
+    font-size: .9em;
+}
+
+.top_panel__social-link {
+    color: #999;
+    margin: 0 4px;
+    font-size: 1em;
 }
 
 .page_header_logo-caption {
@@ -11,13 +79,13 @@
     max-width: 5.3em;
     padding-left: 1em;
     border-left: solid 1px #d5d5d5;
-    margin-left: 1em;
+    margin-left: 1.1em;
 }
 
 .icon-svg {
     display: inline-block;
-    width: 1.375em;
-    height: 1.375em;
+    width: 1em;
+    height: 1em;
     fill: currentColor;
     fill-rule: evenodd;
     vertical-align: middle;
@@ -40,11 +108,11 @@
 }
 
 .d-none {
-    display: none!important;
+    display: none !important;
 }
 
 .text-decoration-none {
-    text-decoration: none!important;
+    text-decoration: none !important;
 }
 
 .text-gray {
@@ -81,4 +149,31 @@
 .phone-item a {
     height: 1.375em;
     margin-left: .3em;
+}
+
+
+.page_top_bar {
+    height: 36px;
+    padding: 4px 0;
+    background-color: #f2f2f2;
+}
+
+.header_panel_left_divider {
+    border-left: solid 1px #d5d5d5;
+    margin-left: 1.1em;
+}
+
+
+.footer_copyright {
+    background-color: rgba(255, 255, 255, .13);
+    font-size: .8rem;
+    color: white;
+    margin-top: 15px;
+}
+
+.list-unstyled {
+    list-style: none;
+}
+.navbar {
+    position: inherit;
 }
