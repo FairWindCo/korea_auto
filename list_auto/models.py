@@ -1,3 +1,5 @@
+from select import select
+
 from django.db import models
 
 
@@ -152,3 +154,6 @@ class Car(models.Model):
 
     def get_car_images(self):
         return [ f'{self.car_code}/big_image_{i}.jpg' for i in self.get_image_range()]
+
+    def get_option(self):
+        return self.options.order_by('option_group', 'name').iterator()

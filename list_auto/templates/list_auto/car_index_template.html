@@ -1,0 +1,240 @@
+{% extends 'list_auto/base_template.html' %}
+{% load static %}
+{% load humanize %}
+{% load i18n %}
+
+{% block css_header_extend %}
+    <link rel="stylesheet" href="{% static 'vue_utils/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'assert/theme.css' %}">
+{% endblock %}
+
+
+{% block main_content_block %}
+    <section>
+        <div class="container car_select_form">
+            <div class="row">
+                <div class="col-12 clearfix text-center"><h3>Быстрый подбор авто</h3></div>
+                <div class="col-3 d-none d-md-block">
+                    <img class="col-my-flex-shrink" src="{% static 'assert/KOREAStyle_1.png' %}">
+                </div>
+                <div class="col-md-9 col-sm-12">
+                    <form action="" method="post">
+                        <div class="container">
+                            <div class="row">
+                                <div class="col-lg-4">
+                                    <div class="row">
+                                        <div class="col-12"><label
+                                                class="main__form-label">Кузов</label></div>
+                                        <div class="col-12">
+                                                                <span class="form-control-wrap car_type"><select
+                                                                        data-select2-theme="plc" name="car_type"
+                                                                        class="form-control select w-100 styled-select s2 select2-hidden-accessible"
+                                                                        aria-invalid="false" data-select2-id="3"
+                                                                        tabindex="-1" aria-hidden="true"><option
+                                                                        value="Любой" data-select2-id="5">Любой</option><option
+                                                                        value="Седан">Седан</option><option
+                                                                        value="Внедорожник">Внедорожник</option><option
+                                                                        value="Хэтчбек">Хэтчбек</option><option
+                                                                        value="Универсал">Универсал</option><option
+                                                                        value="Купе">Купе</option><option
+                                                                        value="Минивэн">Минивэн</option><option
+                                                                        value="Пикап">Пикап</option></select><span
+                                                                        class="select2 select2-container select2-container--plc"
+                                                                        dir="ltr" data-select2-id="4"
+                                                                        style="width: 100%;"><span
+                                                                        class="selection"><span
+                                                                        class="select2-selection select2-selection--single"
+                                                                        role="combobox" aria-haspopup="true"
+                                                                        aria-expanded="false" tabindex="0"
+                                                                        aria-disabled="false"
+                                                                        aria-labelledby="select2-car_type-qo-container"><span
+                                                                        class="select2-selection__rendered"
+                                                                        id="select2-car_type-qo-container"
+                                                                        role="textbox" aria-readonly="true"
+                                                                        title="Любой">Любой</span><span
+                                                                        class="select2-selection__arrow"
+                                                                        role="presentation"><b role="presentation"></b></span></span></span><span
+                                                                        class="dropdown-wrapper"
+                                                                        aria-hidden="true"></span></span></span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="row">
+                                        <div class="col-12"><label
+                                                class="main__form-label inputs__label">Год
+                                            выпуска</label></div>
+                                        <div class="col-6">
+                                                                <span class="form-control-wrap car_year_from"><input
+                                                                        type="number" name="car_year_from" value="2012"
+                                                                        class="form-control number validates-as-number input_year text-center"
+                                                                        id="selection_car_from" min="1990" max="2021"
+                                                                        aria-invalid="false"></span>
+                                        </div>
+                                        <div class="col-6">
+                                                                <span class="form-control-wrap car_year_to"><input
+                                                                        type="number" name="car_year_to" value="2019"
+                                                                        class="form-control number validates-as-number input_year text-center"
+                                                                        id="selection_car_to" min="1990" max="2021"
+                                                                        aria-invalid="false"></span>
+                                        </div>
+                                        <div class="col-12 mt-n1">
+                                            <div data-nouislider-range="" data-step="1"
+                                                 data-min-target="#selection_car_from"
+                                                 data-max-target="#selection_car_to"
+                                                 class="noUi-target noUi-ltr noUi-horizontal noUi-txt-dir-ltr">
+                                                <div class="noUi-base">
+                                                    <div class="noUi-connects">
+                                                        <div class="noUi-connect"
+                                                             style="transform: translate(70.9677%, 0px) scale(0.225806, 1);"></div>
+                                                    </div>
+                                                    <div class="noUi-origin"
+                                                         style="transform: translate(-290.323%, 0px); z-index: 5;">
+                                                        <div class="noUi-handle noUi-handle-lower"
+                                                             data-handle="0" tabindex="0"
+                                                             role="slider"
+                                                             aria-orientation="horizontal"
+                                                             aria-valuemin="1990.0"
+                                                             aria-valuemax="2019.0"
+                                                             aria-valuenow="2012.0"
+                                                             aria-valuetext="2012">
+                                                            <div class="noUi-touch-area"></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="noUi-origin"
+                                                         style="transform: translate(-64.5161%, 0px); z-index: 4;">
+                                                        <div class="noUi-handle noUi-handle-upper"
+                                                             data-handle="1" tabindex="0"
+                                                             role="slider"
+                                                             aria-orientation="horizontal"
+                                                             aria-valuemin="2012.0"
+                                                             aria-valuemax="2021.0"
+                                                             aria-valuenow="2019.0"
+                                                             aria-valuetext="2019">
+                                                            <div class="noUi-touch-area"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <div class="row">
+                                        <div class="col-12"><label
+                                                class="main__form-label inputs__label">Стоимость,
+                                            $</label></div>
+                                        <div class="col-6">
+                                                                <span class="form-control-wrap car_price_from"><input
+                                                                        type="number" name="car_price_from" value="0"
+                                                                        class="form-control number validates-as-number input_price text-center"
+                                                                        id="selection_car_price_from" min="0"
+                                                                        max="30000" aria-invalid="false"></span>
+                                        </div>
+                                        <div class="col-6">
+                                                                <span class="form-control-wrap car_price_to"><input
+                                                                        type="number" name="car_price_to" value="12000"
+                                                                        class="form-control number validates-as-number input_price text-center"
+                                                                        id="selection_car_price_to" min="3000"
+                                                                        max="30000" aria-invalid="false"></span>
+                                        </div>
+                                        <div class="col-12 mt-n1">
+                                            <div data-nouislider-range="" data-step="1"
+                                                 data-min-target="#selection_car_price_from"
+                                                 data-max-target="#selection_car_price_to"
+                                                 class="noUi-target noUi-ltr noUi-horizontal noUi-txt-dir-ltr">
+                                                <div class="noUi-base">
+                                                    <div class="noUi-connects">
+                                                        <div class="noUi-connect"
+                                                             style="transform: translate(0%, 0px) scale(0.4, 1);"></div>
+                                                    </div>
+                                                    <div class="noUi-origin"
+                                                         style="transform: translate(-1000%, 0px); z-index: 5;">
+                                                        <div class="noUi-handle noUi-handle-lower"
+                                                             data-handle="0" tabindex="0"
+                                                             role="slider"
+                                                             aria-orientation="horizontal"
+                                                             aria-valuemin="0.0"
+                                                             aria-valuemax="12000.0"
+                                                             aria-valuenow="0.0" aria-valuetext="0">
+                                                            <div class="noUi-touch-area"></div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="noUi-origin"
+                                                         style="transform: translate(-600%, 0px); z-index: 6;">
+                                                        <div class="noUi-handle noUi-handle-upper"
+                                                             data-handle="1" tabindex="0"
+                                                             role="slider"
+                                                             aria-orientation="horizontal"
+                                                             aria-valuemin="0.0"
+                                                             aria-valuemax="30000.0"
+                                                             aria-valuenow="12000.0"
+                                                             aria-valuetext="12000">
+                                                            <div class="noUi-touch-area"></div>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-4">
+                                    <label class="main__form-label">Ваше имя<span class="required"
+                                                                                  title="обязательно">*</span></label>
+                                    <span class="form-control-wrap user_name"><input
+                                            type="text" name="user_name" value="" size="40"
+                                            class="form-control text validates-as-required w-100"
+                                            aria-required="true" aria-invalid="false"
+                                            placeholder="Имя"></span>
+                                </div>
+                                <div class="col-lg-4">
+                                    <label class="main__form-label">Ваш телефон<span
+                                            class="required" title="обязательно">*</span></label>
+                                    <span class="form-control-wrap user_phone"><input
+                                            type="tel" name="user_phone" value="" size="40"
+                                            class="form-control text tel validates-as-required validates-as-tel w-100"
+                                            aria-required="true" aria-invalid="false"
+                                            placeholder="+38 (___) ___-__-__" maxlength="19"></span>
+                                </div>
+                                <div class="col-lg-4">
+                                    <label class="main__form-label">&nbsp;</label> <input
+                                        type="submit" value="Подобрать"
+                                        class="form-control submit btn btn-primary w-100"><span
+                                        class="ajax-loader"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="response-output" aria-hidden="true"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="hot_propose">
+        <div class="container">
+            <h4>Горячие предложения</h4>
+            <div class="row align-items-center justify-content-center">
+                {% for car in car_list %}
+                    <div class="m-1 col-sm-12 col-md-3 d-flex flex-column bd-highlight car_propose">
+                        <div class="p-3 bd-highlight align-self-center text-center">{{ car.model_version }}</div>
+                        <div class="m-n2 p-0 bd-highlight">
+                            <img src="{% get_media_prefix %}/{{ car.car_code }}/ImageThumb.jpg">
+                        </div>
+                        <div class="p-3 bd-highlight align-self-center">
+                            <svg class="icon-svg dollar" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                <use xlink:href="{% static 'assert/dollars_money.svg' %}#dollars"
+                                     href="{% static 'assert/dollars_money.svg' %}#dollars">
+                                </use>
+                            </svg>
+                            {{ car.get_price|intcomma }} ₩
+                        </div>
+                        <div class="p-2 bd-highlight align-self-center">
+                            <a href="{% url 'car_detail' car.pk %}" class="btn btn-primary">Детально</a>
+
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+{% endblock %}
