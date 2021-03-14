@@ -1,0 +1,83 @@
+{% extends 'list_auto/base_template.html' %}
+{% load static %}
+{% load humanize %}
+{% load i18n %}
+
+{% block css_header_extend %}
+    <link rel="stylesheet" href="{% static 'vue_utils/theme.css' %}">
+    <link rel="stylesheet" href="{% static 'assert/theme.css' %}">
+{% endblock %}
+
+
+{% block main_content_block %}
+    <article class="detail_car_info container">
+        <div class="container car_detail_block">
+            <div class="row">
+
+                <div class="col-9">
+                    <div class="container">
+                        <div class="row">
+                            <div class="col-12">
+                                <h3>{{ object.model_version }}</h3>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div id="carouselExampleDark" class="carousel carousel-dark slide m-1"
+                                     data-bs-touch="false"
+                                     data-bs-interval="false">
+                                    <div class="carousel-indicators">
+                                        {% for i in object.get_image_range %}
+                                            <button type="button" data-bs-target="#carouselExampleDark"
+                                                    data-bs-slide-to="{{ forloop.counter0 }}"
+                                                    {% if forloop.counter == 1 %}
+                                                    class="active" aria-current="true"
+                                                    {% endif %}
+                                                    aria-label="Image {{ i }}"></button>
+                                        {% endfor %}
+                                    </div>
+                                    <div class="carousel-inner">
+                                        {% for image in object.get_car_images %}
+                                            <div class="carousel-item
+                            {% if forloop.counter == 1 %}
+                            active
+                            {% endif %}
+                            ">
+                                                <img src="{% get_media_prefix %}{{ image }}" class="d-block w-100"
+                                                     alt="...">
+                                            </div>
+                                        {% endfor %}
+                                    </div>
+                                    <button class="carousel-control-prev" type="button"
+                                            data-bs-target="#carouselExampleDark" data-bs-slide="prev">
+                                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Previous</span>
+                                    </button>
+                                    <button class="carousel-control-next" type="button"
+                                            data-bs-target="#carouselExampleDark" data-bs-slide="next">
+                                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                        <span class="visually-hidden">Next</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row align-items-center justify-content-center">
+                            <div class="col-9">
+                                {% include 'list_auto/short_info.html' with car=object %}
+                            </div>
+                        </div>
+                        <div class="row">
+                            <ul class="option_list">
+                            {% for option in object.options.iterator %}
+                                <li class="col">{{ option.name }}</li>
+                            {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-3"></div>
+
+            </div>
+        </div>
+    </article>
+{% endblock %}

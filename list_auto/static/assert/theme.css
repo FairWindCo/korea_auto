@@ -248,3 +248,22 @@ svg {
 .m-n2 {
   margin: -0.5rem !important;
 }
+.detail_car_info{
+    color: white;
+}
+.detail_car_info h3{
+    color: white;
+    text-align: center;
+}
+.detail_car_info .icon-svg{
+    width: 2em;
+    height: 2em;
+}
+
+.short_info{
+    color:white;
+}
+
+.option_list{
+    column-count: 2;
+}

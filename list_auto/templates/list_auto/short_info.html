@@ -1,0 +1,58 @@
+{% load static %}
+{% load humanize %}
+<div class="container-fluid">
+    <div class="row justify-content-center short_info">
+        <div class="col-auto">
+            <svg class="icon-svg engine_icon" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <use xlink:href="{% static 'assert/dollars_money.svg' %}#engine"
+                     href="{% static 'assert/dollars_money.svg' %}#engine">
+                </use>
+            </svg>
+        </div>
+        <div class="col-auto">
+            {{ car.model_version.get_engine_volume|default_if_none:'--' }}
+        </div>
+        <div class="col-auto">
+            <svg class="icon-svg road_m_icon" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <use xlink:href="{% static 'assert/dollars_money.svg' %}#road_a"
+                     href="{% static 'assert/dollars_money.svg' %}#road_a">
+                </use>
+            </svg>
+        </div>
+        <div class="col-auto">
+            {{ car.mileage|intcomma }} км
+        </div>
+        <div class="col-auto">
+            <svg class="icon-svg road_m_icon" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <use xlink:href="{% static 'assert/dollars_money.svg' %}#gasoline"
+                     href="{% static 'assert/dollars_money.svg' %}#gasoline">
+                </use>
+            </svg>
+        </div>
+        <div class="col-auto">{{ car.gasoline }}</div>
+        <div class="col-auto">
+            <svg class="icon-svg bodycar_icon" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <use xlink:href="{% static 'assert/dollars_money.svg' %}#car_top"
+                     href="{% static 'assert/dollars_money.svg' %}#car_top">
+                </use>
+            </svg>
+        </div>
+        <div class="col-auto">{{ car.model_version.body_type|default_if_none:'--' }}</div>
+        <div class="col-auto">
+            <svg class="icon-svg bodycar_icon" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <use xlink:href="{% static 'assert/dollars_money.svg' %}#transmission"
+                     href="{% static 'assert/dollars_money.svg' %}#transmission">
+                </use>
+            </svg>
+        </div>
+        <div class="col-auto">{{ car.transmission }}</div>
+                <div class="col-auto">
+            <svg class="icon-svg bodycar_icon" xmlns:xlink="http://www.w3.org/1999/xlink">
+                <use xlink:href="{% static 'assert/dollars_money.svg' %}#calendar"
+                     href="{% static 'assert/dollars_money.svg' %}#calendar">
+                </use>
+            </svg>
+        </div>
+        <div class="col-auto">{{ car.year }}</div>
+    </div>
+</div>

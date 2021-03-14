@@ -30,11 +30,23 @@ class CarModel(models.Model):
         return f'{self.brand.name} {self.name}'
 
 
+class BodyType(models.Model):
+    name = models.CharField(verbose_name='Тип кузова', max_length=50)
+    class Meta:
+        verbose_name = 'Тип кузова'
+        verbose_name_plural = 'Типы кузова'
+
+    def __str__(self):
+        return f'{self.name}'
+
 class CarVersion(models.Model):
     name = models.CharField(verbose_name='Версия модели', max_length=50)
     korea_name = models.CharField(verbose_name='Корейское название модели', max_length=100)
     code = models.IntegerField(verbose_name='Код на корейском сайте')
     model_version = models.ForeignKey(CarModel, on_delete=models.CASCADE)
+    engine_volume = models.IntegerField(verbose_name='Объем двигателя', null=True, blank=True, max_length=2)
+    four_wd = models.BooleanField(verbose_name='4WD', null=True, blank=True)
+    body_type = models.ForeignKey(BodyType, on_delete=models.CASCADE, verbose_name='Тип кузова', blank=True, null=True)
 
     class Meta:
         verbose_name = 'Версия Модели'
@@ -43,11 +55,15 @@ class CarVersion(models.Model):
     def __str__(self):
         return f'{self.model_version} {self.name}'
 
+    def get_engine_volume(self):
+        return f'{self.engine_volume/10:.1f}' if self.engine_volume is not None else None
+
 
 class CarOptions(models.Model):
     name = models.CharField(verbose_name='Опция', max_length=50)
     korea_name = models.CharField(verbose_name='Корейское название', max_length=100)
     code = models.IntegerField(verbose_name='Код на корейском сайте')
+    option_group = models.IntegerField(verbose_name='Код гурппы опций', default=0)
 
     class Meta:
         verbose_name = 'Опиция'
@@ -130,3 +146,9 @@ class Car(models.Model):
 
     def get_price(self):
         return (self.price if self.price>0 else self.price_dealer) * 1000
+
+    def get_image_range(self):
+        return range(1, self.image_count+1)
+
+    def get_car_images(self):
+        return [ f'{self.car_code}/big_image_{i}.jpg' for i in self.get_image_range()]

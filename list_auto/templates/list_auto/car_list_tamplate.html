@@ -229,7 +229,7 @@
                             {{ car.get_price|intcomma }} ₩
                         </div>
                         <div class="p-2 bd-highlight align-self-center">
-                            <button class="btn btn-primary">Детально</button>
+                            <a href="{% url 'car_detail' car.pk %}" class="btn btn-primary">Детально</a>
 
                         </div>
                     </div>
