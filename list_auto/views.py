@@ -10,6 +10,7 @@ class CarListView(ListView):
     model = Car
     paginate_by = 5
     template_name = 'list_auto/car_list_tamplate.html'
+    ordering = '-created'
 
 
 class CarDetailView(DetailView):
