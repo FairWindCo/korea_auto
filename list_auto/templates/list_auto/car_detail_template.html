@@ -54,11 +54,11 @@
                         </button>
                     </div>
                 </div>
-                <div class="col-3">
+                <div class="col-3 car_propose">
                     {% include 'list_auto/short_info.html' with car=object %}
                 </div>
-                <div class="col-9">
-                    <ul class="option_list">
+                <div class="p-3 col-9 car_propose">
+                    <ul class="option_list ">
                         {% for option in object.get_option %}
                             <li class="col">{{ option.name }}</li>
                         {% endfor %}

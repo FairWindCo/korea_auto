@@ -30,32 +30,15 @@
                                                                         data-select2-theme="plc" name="car_type"
                                                                         class="form-control select w-100 styled-select s2 select2-hidden-accessible"
                                                                         aria-invalid="false" data-select2-id="3"
-                                                                        tabindex="-1" aria-hidden="true"><option
-                                                                        value="Любой" data-select2-id="5">Любой</option><option
-                                                                        value="Седан">Седан</option><option
-                                                                        value="Внедорожник">Внедорожник</option><option
-                                                                        value="Хэтчбек">Хэтчбек</option><option
-                                                                        value="Универсал">Универсал</option><option
-                                                                        value="Купе">Купе</option><option
-                                                                        value="Минивэн">Минивэн</option><option
-                                                                        value="Пикап">Пикап</option></select><span
-                                                                        class="select2 select2-container select2-container--plc"
-                                                                        dir="ltr" data-select2-id="4"
-                                                                        style="width: 100%;"><span
-                                                                        class="selection"><span
-                                                                        class="select2-selection select2-selection--single"
-                                                                        role="combobox" aria-haspopup="true"
-                                                                        aria-expanded="false" tabindex="0"
-                                                                        aria-disabled="false"
-                                                                        aria-labelledby="select2-car_type-qo-container"><span
-                                                                        class="select2-selection__rendered"
-                                                                        id="select2-car_type-qo-container"
-                                                                        role="textbox" aria-readonly="true"
-                                                                        title="Любой">Любой</span><span
-                                                                        class="select2-selection__arrow"
-                                                                        role="presentation"><b role="presentation"></b></span></span></span><span
-                                                                        class="dropdown-wrapper"
-                                                                        aria-hidden="true"></span></span></span>
+                                                                        tabindex="-1" aria-hidden="true">
+                                                                    <option value="any"
+                                                                            data-select2-id="-1">Любой</option>
+                                                                    {% for body in car_body %}
+                                                                        <option value="{{ body.pk }}"
+                                                                                data-select2-id="{{ body.pk }}">{{ body.name }}</option>
+                                                                    {% endfor %}
+                                                                </select>
+                                                                    </span>
                                         </div>
                                     </div>
                                 </div>

@@ -267,3 +267,11 @@ svg {
 .option_list{
     column-count: 2;
 }
+
+.p-text-right{
+    text-align: right;
+}
+
+.p-text-left{
+    text-align: left;
+}
