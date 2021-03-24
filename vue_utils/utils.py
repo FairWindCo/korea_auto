@@ -1,3 +1,5 @@
+from typing import Iterable, Dict, Tuple, List
+
 from django.core import serializers
 from django.core.paginator import Paginator
 
@@ -56,3 +58,64 @@ def process_paging(request, objects, default_page_size='25', serializer=dict_ser
         'per_page': page_size,
         'count': paginator.count
     }
+
+
+def get_from_container(container, field_list_with_default_values: List[Tuple[str, any]], use_container_as_value=False):
+    result = []
+    if isinstance(container, str) and use_container_as_value:
+        result = [def_value for field_name, def_value in field_list_with_default_values]
+        result[0] = container
+    elif isinstance(container, Dict):
+        for field_name, def_value in field_list_with_default_values:
+            result.append(container.get(field_name, def_value))
+    elif isinstance(container, Iterable):
+        result = [def_value for field_name, def_value in field_list_with_default_values]
+        for index, value_for_field in enumerate(container[:len(result)]):
+            result[index] = value_for_field
+    elif use_container_as_value:
+        result = [def_value for field_name, def_value in field_list_with_default_values]
+        result[0] = container
+    else:
+        result = None
+    return result
+
+
+def form_filter_dict(request, filter_list, default_filter_action='icontains'):
+    if filter_list:
+        filter_dict = {}
+        form_values = {}
+        for filter_field_name in filter_list:
+            current_field = None
+            form_field_name = None
+            filter_action = None
+            if isinstance(filter_field_name, str):
+                value = get_from_request(request, filter_field_name)
+                current_field = filter_field_name
+                filter_action = default_filter_action
+
+            elif isinstance(filter_field_name, Dict) or isinstance(filter_field_name, Iterable):
+                if 'field_name' in filter_field_name:
+                    current_field, filter_action, form_field_name = get_from_container(filter_field_name, [
+                        ('field_name', None),
+                        ('field_action', default_filter_action),
+                        ('form_field_name', None),
+                    ])
+            if form_field_name is None:
+                form_field_name = current_field
+
+            value = get_from_request(request, form_field_name)
+            if current_field and value:
+                if isinstance(value, Dict) or isinstance(value, Iterable):
+                    current_value, filter_action = get_from_container(value,[
+                        ('value', None),
+                        ('action', filter_action)
+                    ], True)
+                    if current_value:
+                        filter_dict[f'{current_field}__{filter_action}'] = current_value
+                        form_values[form_field_name] = current_value
+                else:
+                    filter_dict[f'{current_field}__{filter_action}'] = value
+                    form_values[form_field_name] = value
+        return filter_dict, form_values
+    else:
+        return None, None

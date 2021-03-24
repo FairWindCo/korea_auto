@@ -11,6 +11,27 @@
 
 {% block main_content_block %}
     <section class="hot_propose">
+    <div class="container">
+        <div class="row">
+        <div class="col-2">
+            <form method="get">
+                <div class="form-floating">
+                <select name="year" class="form-select" id="year_filter">
+                    <option label="любой" value=""></option>
+                    {% for year in filter_year_list %}
+                        <option value="{{ year }}" label="{{ year }}"
+                            {% if filter_form_values and filter_form_values.year and filter_form_values.year == year %}
+                                selected
+                            {% endif %}
+                        ></option>
+                    {% endfor %}
+                </select>
+                <label class="text-secondary" for="year_filter">ГОД:</label>
+                </div>
+                <button class="btn primary" type="submit">ФИЛЬТР</button>
+            </form>
+        </div>
+        <div class="col-10">
         <div class="container">
             <h4>Список машин</h4>
 
@@ -46,5 +67,8 @@
                 {% include 'vue_utils/paginator.html' with page_obj=page_obj %}
             </div>
         </div>
+        </div>
+        </div>
+    </div>
     </section>
 {% endblock %}

@@ -11,7 +11,7 @@ def times(number):
 def create_page_range(current_page, max_pages, before_page=True, show_page_count=2):
     if before_page:
         if current_page - show_page_count < 0:
-            return range(0, current_page)
+            return range(1, current_page)
         else:
             return range(current_page - show_page_count, current_page)
     else:

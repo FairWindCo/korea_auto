@@ -1,15 +1,20 @@
 from django.shortcuts import render
-
 # Create your views here.
-from django.views.generic import ListView, DetailView
+from django.views.generic import DetailView
 
 from list_auto.models import Car, BodyType
+from vue_utils.views import FilterListView
 
 
-class CarListView(ListView):
+class CarListView(FilterListView):
     model = Car
     paginate_by = 5
     template_name = 'list_auto/car_list_tamplate.html'
+
+    def get_additional_context_attribute(self):
+        return {
+            'filter_year_list': [str(year) for year in range(2000, 2021)]
+        }
 
 
 class CarDetailView(DetailView):
