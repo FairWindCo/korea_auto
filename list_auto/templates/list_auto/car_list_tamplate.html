@@ -12,78 +12,96 @@
 
 {% block main_content_block %}
     <section class="hot_propose">
-    <div class="container">
-        <div class="row">
-        <div class="col-2">
-            <form method="get">
-                <div class="form-floating">
-                <select name="year" class="form-select" id="year_filter">
-                    <option label="любой" value=""></option>
-                    {% for year in filter_year_list %}
-                        <option value="{{ year }}" label="{{ year }}"
-                            {% if filter_form_values and filter_form_values.year and filter_form_values.year == year %}
-                                selected
-                            {% endif %}
-                        ></option>
-                    {% endfor %}
-                </select>
-                <label class="text-secondary" for="year_filter">ГОД:</label>
-                </div>
-                <div class="form-floating">
-                <select name="body" class="form-select" id="body_filter">
-                    <option label="любой" value=""></option>
-                    {% for body in filter_body_list %}
-                        <option value="{{ body.pk }}" label="{{ body.name }}"
-                            {% if filter_form_values and filter_form_values.body and filter_form_values.body == body.pk %}
-                                selected
-                            {% endif %}
-                        ></option>
-                    {% endfor %}
-                </select>
-                <label class="text-secondary" for="body_filter">КУЗОВ:</label>
-                </div>
-                <button class="btn primary" type="submit">ФИЛЬТР</button>
-            </form>
-        </div>
-        <div class="col-10">
         <div class="container">
-            <h4>Список машин</h4>
+            <div class="row">
+                <div class="col-2">
+                    <form method="post">
+                        {% csrf_token %}
+                        <div class="form-floating m-1">
+                            <select name="year" class="form-select" id="year_filter">
+                                <option label="любой" value=""></option>
+                                {% for year in filter_year_list %}
+                                    <option value="{{ year }}" label="{{ year }}"
+                                            {% if filter_form_values and filter_form_values.year and filter_form_values.year == year %}
+                                            selected
+                                            {% endif %}
+                                    ></option>
+                                {% endfor %}
+                            </select>
+                            <label class="text-secondary" for="year_filter">ГОД:</label>
+                        </div>
+                        <div class="form-floating m-1">
+                            <select name="body" class="form-select" id="body_filter">
+                                <option label="любой" value=""></option>
+                                {% for body in filter_body_list %}
+                                    <option value="{{ body.pk }}" label="{{ body.name }}"
+                                            {% if filter_form_values and filter_form_values.body and filter_form_values.body == body.pk %}
+                                            selected
+                                            {% endif %}
+                                    ></option>
+                                {% endfor %}
+                            </select>
+                            <label class="text-secondary" for="body_filter">КУЗОВ:</label>
+                        </div>
+                        <div class="form-floating m-1">
+                            <select name="brand" class="form-select" id="brand_filter">
+                                <option label="любой" value=""></option>
+                                {% for brand in filter_brand_list %}
+                                    <option value="{{ brand.pk }}" label="{{ brand.name }}"
+                                            {% if filter_form_values and filter_form_values.brand and filter_form_values.brand == brand.pk %}
+                                            selected
+                                            {% endif %}
+                                    ></option>
+                                {% endfor %}
+                            </select>
+                            <label class="text-secondary" for="brand_filter">БРЕНД:</label>
+                        </div>
+                        <button class="btn primary" type="submit">ФИЛЬТР</button>
+                    </form>
+                </div>
+                <div class="col-10">
+                    <div class="container">
+                        <h4>Список машин</h4>
 
-            {% for car in car_list %}
-                <div class="row align-items-start justify-content-center d-flex flex-row car_propose m-2 p-1">
-                    <div class="col-md-4 col-sm-12 row justify-content-center">
-                        <img src="{% get_media_prefix %}/{{ car.car_code }}/ImageThumb.jpg">
+                        {% for car in car_list %}
+                            <div class="row align-items-start justify-content-center d-flex flex-row car_propose m-2 p-1">
+                                <div class="col-md-4 col-sm-12 row justify-content-center">
+                                    <img src="{% get_media_prefix %}/{{ car.car_code }}/ImageThumb.jpg">
+                                </div>
+                                <div class="col-md-8 col-sm-12 d-flex flex-column">
+                                    <div class="col-12 p-3 bd-highlight align-self-center text-center">{{ car.model_version }}</div>
+                                    <div class="col-12">
+                                        {% include 'list_auto/short_list_info.html' with car=car %}
+                                    </div>
+                                    <div class="col-sm-12 col-md-12 row">
+                                        <div class="p-3 bd-highlight p-text-left col-6">
+                                            <svg class="icon-svg dollar" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                                <use xlink:href="{% static 'assert/dollars_money.svg' %}#dollars"
+                                                     href="{% static 'assert/dollars_money.svg' %}#dollars">
+                                                </use>
+                                            </svg>
+                                            {{ car.get_price|intcomma }} ₩
+                                        </div>
+                                        <div class="p-2 bd-highlight p-text-right col-6">
+                                            <a href="{% url 'car_detail' car.pk %}" class="btn btn-primary">Детально</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        {% empty %}
+                            <div class="row align-items-start justify-content-center d-flex flex-row car_propose m-2 p-1">
+                                <span>К сожалению по вашему запросу машины не найдены</span>
+                            </div>
+                        {% endfor %}
                     </div>
-                    <div class="col-md-8 col-sm-12 d-flex flex-column">
-                        <div class="col-12 p-3 bd-highlight align-self-center text-center">{{ car.model_version }}</div>
-                        <div class="col-12">
-                            {% include 'list_auto/short_list_info.html' with car=car %}
+                    <div class="container">
+                        <div class="row d-flex d-flex-row justify-content-center">
+                            {% paging_navigation page_obj %}
                         </div>
-                        <div class="col-sm-12 col-md-12 row">
-                            <div class="p-3 bd-highlight p-text-left col-6">
-                                <svg class="icon-svg dollar" xmlns:xlink="http://www.w3.org/1999/xlink">
-                                    <use xlink:href="{% static 'assert/dollars_money.svg' %}#dollars"
-                                         href="{% static 'assert/dollars_money.svg' %}#dollars">
-                                    </use>
-                                </svg>
-                                {{ car.get_price|intcomma }} ₩
-                            </div>
-                            <div class="p-2 bd-highlight p-text-right col-6">
-                                <a href="{% url 'car_detail' car.pk %}" class="btn btn-primary">Детально</a>
-                            </div>
-                        </div>
+
                     </div>
                 </div>
-            {% endfor %}
-        </div>
-        <div class="container">
-            <div class="row d-flex d-flex-row justify-content-center">
-                {% paging_navigation page_obj %}
             </div>
-
         </div>
-        </div>
-        </div>
-    </div>
     </section>
 {% endblock %}

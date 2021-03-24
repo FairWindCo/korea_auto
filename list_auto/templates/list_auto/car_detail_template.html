@@ -20,16 +20,7 @@
                     <div id="carouselExampleDark" class="carousel carousel-dark slide m-1"
                          data-bs-touch="false"
                          data-bs-interval="false">
-                        <div class="carousel-indicators">
-                            {% for i in object.get_image_range %}
-                                <button type="button" data-bs-target="#carouselExampleDark"
-                                        data-bs-slide-to="{{ forloop.counter0 }}"
-                                        {% if forloop.counter == 1 %}
-                                        class="active" aria-current="true"
-                                        {% endif %}
-                                        aria-label="Image {{ i }}"></button>
-                            {% endfor %}
-                        </div>
+
                         <div class="carousel-inner">
                             {% for image in object.get_car_images %}
                                 <div class="carousel-item
@@ -53,6 +44,20 @@
                             <span class="visually-hidden">Next</span>
                         </button>
                     </div>
+                <ol class="col- 9 carousel-indicators">
+                            {% for image in object.get_car_images %}
+                                <li type="button" data-bs-target="#carouselExampleDark"
+                                    data-bs-slide-to="{{ forloop.counter0 }}"
+                                        {% if forloop.counter == 1 %}
+                                    class="active" aria-current="true"
+                                        {% endif %}
+                                    aria-label="{{ image }}">
+                                    <img
+                                            src="{% get_media_prefix %}{{ image }}"
+                                            class="d-block w-100">
+                                </li>
+                            {% endfor %}
+                        </ol>
                 </div>
                 <div class="col-3 car_propose">
                     {% include 'list_auto/short_info.html' with car=object %}

@@ -84,6 +84,7 @@ def form_filter_dict(request, filter_list, default_filter_action='icontains'):
     if filter_list:
         filter_dict = {}
         form_values = {}
+        form_field_converter = None
         for filter_field_name in filter_list:
             current_field = None
             form_field_name = None
@@ -95,24 +96,38 @@ def form_filter_dict(request, filter_list, default_filter_action='icontains'):
 
             elif isinstance(filter_field_name, Dict) or isinstance(filter_field_name, Iterable):
                 if 'field_name' in filter_field_name:
-                    current_field, filter_action, form_field_name = get_from_container(filter_field_name, [
+                    current_field, filter_action, form_field_name, form_field_converter = get_from_container(filter_field_name, [
                         ('field_name', None),
                         ('field_action', default_filter_action),
                         ('form_field_name', None),
+                        ('form_field_converter', None),
                     ])
             if form_field_name is None:
                 form_field_name = current_field
 
             value = get_from_request(request, form_field_name)
             if current_field and value:
-                if isinstance(value, Dict) or isinstance(value, Iterable):
+                if not isinstance(value, str) and isinstance(value, Dict) or isinstance(value, Iterable):
                     current_value, filter_action = get_from_container(value,[
                         ('value', None),
                         ('action', filter_action)
                     ], True)
                 else:
                     current_value = value
-
+                if current_value is not None and form_field_converter:
+                    try:
+                        if callable(form_field_converter):
+                            current_value = form_field_converter(current_value)
+                        elif isinstance(form_field_converter, str):
+                            if form_field_converter == 'int':
+                                current_value = int(current_value)
+                            elif form_field_converter == 'float':
+                                current_value = float(current_value)
+                            else:
+                                current_value = str(current_value)
+                    except ValueError:
+                        print('Convert value error')
+                        pass
                 if current_value:
                     if filter_action:
                         filter_dict[f'{current_field}__{filter_action}'] = current_value

@@ -275,3 +275,12 @@ svg {
 .p-text-left{
     text-align: left;
 }
+ol.carousel-indicators{
+    position: relative;
+    margin: 0px;
+}
+ .carousel-indicators li {
+    width: 200px;
+    height: 100%;
+    opacity: 0.8;
+  }

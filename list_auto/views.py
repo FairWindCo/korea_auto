@@ -4,7 +4,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.views.generic import DetailView
 
-from list_auto.models import Car, BodyType
+from list_auto.models import Car, BodyType, Brand
 from vue_utils.views import FilterListView
 
 
@@ -20,6 +20,13 @@ class CarListView(FilterListView):
             'field_name': 'model_version__body_type__id',
             'field_action': '',
             'form_field_name': 'body',
+            'form_field_converter': 'int'
+        },
+        {
+            'field_name': 'model_version__model_version__brand__id',
+            'field_action': '',
+            'form_field_name': 'brand',
+            'form_field_converter': 'int'
         }
     ]
 
@@ -27,6 +34,7 @@ class CarListView(FilterListView):
         return {
             'filter_year_list': [str(year) for year in range(2000, int(datetime.now().year) + 1)],
             'filter_body_list': BodyType.objects.all(),
+            'filter_brand_list': Brand.objects.all(),
         }
 
 
