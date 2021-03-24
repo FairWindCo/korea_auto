@@ -10,6 +10,7 @@ class CarListView(FilterListView):
     model = Car
     paginate_by = 5
     template_name = 'list_auto/car_list_tamplate.html'
+    ordering = '-created'
 
     def get_additional_context_attribute(self):
         return {

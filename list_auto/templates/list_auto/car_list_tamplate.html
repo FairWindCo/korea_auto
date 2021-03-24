@@ -1,4 +1,5 @@
 {% extends 'list_auto/base_template.html' %}
+{% load fw_paginator %}
 {% load static %}
 {% load humanize %}
 {% load i18n %}
@@ -64,8 +65,9 @@
         </div>
         <div class="container">
             <div class="row d-flex d-flex-row justify-content-center">
-                {% include 'vue_utils/paginator.html' with page_obj=page_obj %}
+                {% paging_navigation page_obj %}
             </div>
+
         </div>
         </div>
         </div>
