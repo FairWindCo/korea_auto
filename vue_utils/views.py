@@ -42,6 +42,7 @@ class FilterListView(ListView):
             filter_def, self.filter_form_values = form_filter_dict(self.last_request, self.filters_fields,
                                                                    self.default_filter_action)
             if filter_def:
+                print(filter_def)
                 list_objects = list_objects.filter(**filter_def)
         return list_objects
 

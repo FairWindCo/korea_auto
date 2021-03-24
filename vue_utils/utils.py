@@ -110,12 +110,16 @@ def form_filter_dict(request, filter_list, default_filter_action='icontains'):
                         ('value', None),
                         ('action', filter_action)
                     ], True)
-                    if current_value:
-                        filter_dict[f'{current_field}__{filter_action}'] = current_value
-                        form_values[form_field_name] = current_value
                 else:
-                    filter_dict[f'{current_field}__{filter_action}'] = value
-                    form_values[form_field_name] = value
+                    current_value = value
+
+                if current_value:
+                    if filter_action:
+                        filter_dict[f'{current_field}__{filter_action}'] = current_value
+                    else:
+                        filter_dict[f'{current_field}'] = current_value
+                    form_values[form_field_name] = current_value
+
         return filter_dict, form_values
     else:
         return None, None

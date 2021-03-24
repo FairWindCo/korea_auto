@@ -29,6 +29,19 @@
                 </select>
                 <label class="text-secondary" for="year_filter">ГОД:</label>
                 </div>
+                <div class="form-floating">
+                <select name="body" class="form-select" id="body_filter">
+                    <option label="любой" value=""></option>
+                    {% for body in filter_body_list %}
+                        <option value="{{ body.pk }}" label="{{ body.name }}"
+                            {% if filter_form_values and filter_form_values.body and filter_form_values.body == body.pk %}
+                                selected
+                            {% endif %}
+                        ></option>
+                    {% endfor %}
+                </select>
+                <label class="text-secondary" for="body_filter">КУЗОВ:</label>
+                </div>
                 <button class="btn primary" type="submit">ФИЛЬТР</button>
             </form>
         </div>
