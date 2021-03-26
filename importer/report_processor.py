@@ -1,8 +1,44 @@
 import glob
 import os
+import re
 from datetime import datetime
 
 from bs4 import BeautifulSoup, NavigableString
+
+# (6) 차대번호
+from importer.translate_report import translate_report_content
+
+vin_reg_expr = re.compile(r'<t[hd].*(\(6\)|⑥)\s*(VIN|차대번호).*</t[hd]>\s*<t[rd].*>\s*([A-Z0-9]{15,20})\s*</',
+                          re.DOTALL + re.MULTILINE)
+drive_reg_expr = re.compile(r'<t[hd].*(\(9\)|⑨)\s*(Двигатель|원동기형식).*</t[hd]>\s*<t[rd].*>\s*([A-Z0-9]{4,12})\s*</',
+                            re.DOTALL + re.MULTILINE)
+# (3) 연식
+year_reg_expr = re.compile(r'<t[hd].*(\(3\)|③)\s*(Год выпуска|연식).*</t[hd]>\s*<t[rd].*>\s*([0-9]{4})\s*</',
+                           re.DOTALL + re.MULTILINE)
+
+
+def extract_vin(text):
+    match = vin_reg_expr.findall(text)
+    if match:
+        return match[0][2]
+    else:
+        return None
+
+
+def extract_driven(text):
+    match = drive_reg_expr.findall(text)
+    if match:
+        return match[0][2]
+    else:
+        return None
+
+
+def extract_year(text):
+    match = year_reg_expr.findall(text)
+    if match:
+        return match[0][2]
+    else:
+        return None
 
 
 def process_year_creation(records, start_index, max_index):
@@ -24,13 +60,14 @@ def process_vin_code(records, start_index, max_index):
     vin = None
     while start_index < max_index:
         elements = records[start_index].find_all()
-        if elements[0].text.strip() == '(6) 차대번호':
-            elements[0].string = '(6) VIN Код'
-            vin = elements[1].text.strip()
-            break
-        elif elements[0].text.strip() == '(6) VIN Код':
-            vin = elements[1].text.strip()
-            break
+        if elements[0] and elements[0].text:
+            if elements[0].text.strip() == '(6) 차대번호':
+                elements[0].string = '(6) VIN Код'
+                vin = elements[1].text.strip()
+                break
+            elif elements[0].text.strip() == '(6) VIN Код':
+                vin = elements[1].text.strip()
+                break
         start_index += 1
     return start_index + 1, vin
 
@@ -124,6 +161,26 @@ def process_report_file(path, dir, translator, can_save=True, replace_standart=T
         try:
             with open(file_path, 'r', encoding='utf8') as file:
                 content = file.read()
+                vin = extract_vin(content)
+                drive = extract_driven(content)
+            if can_save:
+                with open(file_path, "wb") as f_output:
+                    f_output.write(translate_report_content(content))
+
+            return vin, drive, None, None
+        except Exception as e:
+            print(f'ERROR in add.html dir {dir} {e}')
+    else:
+        print(f'ERROR NO FILE add.html in {dir}')
+    return None, None, None, None
+
+
+def process_report_file2(path, dir, translator, can_save=True, replace_standart=True):
+    file_path = os.path.abspath(os.path.join(path, dir, 'add.html'))
+    if os.path.exists(file_path) and os.path.isfile(file_path):
+        try:
+            with open(file_path, 'r', encoding='utf8') as file:
+                content = file.read()
             if replace_standart:
                 replacer = {
                     '만원': ' дес. тыс. Вон',
@@ -154,6 +211,8 @@ def process_report_file(path, dir, translator, can_save=True, replace_standart=T
                 index, year = process_year_creation(records, index, size)
                 index, reg_date = process_first_registration(records, index, size)
                 index, vin = process_vin_code(records, index, size)
+                if vin is None:
+                    print('NO VIN: ' + dir)
                 index = process_fuel(records, index, size)
                 index, drive = process_drive(records, index, size)
 

@@ -193,17 +193,22 @@ STANDART_DICT = {
 }
 
 
-def translate_report_file(_path, _dir, translate_dict=None):
+def translate_report_content(content, translate_dict=None):
     if translate_dict is None:
         translate_dict = STANDART_DICT
+    for key, val in translate_dict.items():
+        content = content.replace(key, val)
+    return content
+
+
+def translate_report_file(_path, _dir, translate_dict=None):
     file_path = os.path.abspath(os.path.join(_path, _dir, 'add.html'))
     if os.path.exists(file_path) and os.path.isfile(file_path):
         try:
             with open(file_path, 'r', encoding='utf8') as file:
                 content = file.read()
             if content:
-                for key, val in translate_dict.items():
-                    content = content.replace(key, val)
+                content = translate_report_content(content, translate_dict)
                 with open(file_path, 'w', encoding='utf8') as file:
                     file.write(content)
             else:

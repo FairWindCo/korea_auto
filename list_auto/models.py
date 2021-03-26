@@ -138,7 +138,7 @@ class Car(models.Model):
     price_dealer = models.IntegerField(verbose_name='Цена Диллера', blank=True, null=True)
     price_sale = models.IntegerField(verbose_name='Цена Продавца', blank=True, null=True)
     lot_register_date = models.DateField(verbose_name='Дата создания лота', blank=True, null=True)
-    created = models.DateTimeField(auto_created=True, verbose_name='Дата добавления в БД')
+    created = models.DateTimeField(auto_now_add=True, verbose_name='Дата добавления в БД')
     car_smear = models.BooleanField(default=None, verbose_name='Наличие пятен', blank=True, null=True)
     car_transformation = models.BooleanField(default=None, verbose_name='Наличие модификаций (изменений)', blank=True,
                                              null=True)
