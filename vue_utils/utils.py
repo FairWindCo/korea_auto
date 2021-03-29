@@ -80,6 +80,33 @@ def get_from_container(container, field_list_with_default_values: List[Tuple[str
     return result
 
 
+def standard_value_converter(value, converter, ignore_conversion_error=True, default_converter_to_str=False):
+    if value is not None and converter:
+        try:
+            if callable(converter):
+                converted_value = converter(value)
+            elif isinstance(converter, str):
+                if converter == 'int':
+                    converted_value = int(value)
+                elif converter == 'float':
+                    converted_value = float(value)
+                else:
+                    converted_value = str(value)
+        except ValueError as err:
+            print('Convert value error')
+            if not ignore_conversion_error:
+                raise err
+            else:
+                print('Convert value error')
+                return None
+    else:
+        if default_converter_to_str:
+            converted_value = str(value)
+        else:
+            converted_value = value
+    return converted_value
+
+
 def form_filter_dict(request, filter_list, default_filter_action='icontains'):
     if filter_list:
         filter_dict = {}
@@ -96,38 +123,26 @@ def form_filter_dict(request, filter_list, default_filter_action='icontains'):
 
             elif isinstance(filter_field_name, Dict) or isinstance(filter_field_name, Iterable):
                 if 'field_name' in filter_field_name:
-                    current_field, filter_action, form_field_name, form_field_converter = get_from_container(filter_field_name, [
-                        ('field_name', None),
-                        ('field_action', default_filter_action),
-                        ('form_field_name', None),
-                        ('form_field_converter', None),
-                    ])
+                    current_field, filter_action, form_field_name, form_field_converter = get_from_container(
+                        filter_field_name, [
+                            ('field_name', None),
+                            ('field_action', default_filter_action),
+                            ('form_field_name', None),
+                            ('form_field_converter', None),
+                        ])
             if form_field_name is None:
                 form_field_name = current_field
 
             value = get_from_request(request, form_field_name)
             if current_field and value:
                 if not isinstance(value, str) and isinstance(value, Dict) or isinstance(value, Iterable):
-                    current_value, filter_action = get_from_container(value,[
+                    current_value, filter_action = get_from_container(value, [
                         ('value', None),
                         ('action', filter_action)
                     ], True)
                 else:
                     current_value = value
-                if current_value is not None and form_field_converter:
-                    try:
-                        if callable(form_field_converter):
-                            current_value = form_field_converter(current_value)
-                        elif isinstance(form_field_converter, str):
-                            if form_field_converter == 'int':
-                                current_value = int(current_value)
-                            elif form_field_converter == 'float':
-                                current_value = float(current_value)
-                            else:
-                                current_value = str(current_value)
-                    except ValueError:
-                        print('Convert value error')
-                        pass
+                current_value = standard_value_converter(current_value, form_field_converter)
                 if current_value:
                     if filter_action:
                         filter_dict[f'{current_field}__{filter_action}'] = current_value

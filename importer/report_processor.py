@@ -1,158 +1,89 @@
 import glob
 import os
 import re
-from datetime import datetime
 
 from bs4 import BeautifulSoup, NavigableString
+from django.utils.datetime_safe import datetime
 
-# (6) 차대번호
 from importer.translate_report import translate_report_content
 
-vin_reg_expr = re.compile(r'<t[hd].*(\(6\)|⑥)\s*(VIN|차대번호).*</t[hd]>\s*<t[rd].*>\s*([A-Z0-9]{15,20})\s*</',
-                          re.DOTALL + re.MULTILINE)
-drive_reg_expr = re.compile(r'<t[hd].*(\(9\)|⑨)\s*(Двигатель|원동기형식).*</t[hd]>\s*<t[rd].*>\s*([A-Z0-9]{4,12})\s*</',
-                            re.DOTALL + re.MULTILINE)
-# (3) 연식
-year_reg_expr = re.compile(r'<t[hd].*(\(3\)|③)\s*(Год выпуска|연식).*</t[hd]>\s*<t[rd].*>\s*([0-9]{4})\s*</',
-                           re.DOTALL + re.MULTILINE)
+simple_year_reg_expr = re.compile('(&nbsp;)*\s*(\(3\)|③)(&nbsp;)*\s*(Год производства|Год выпуска|연식)\s*(&nbsp;)*')
+year_value_reg_expr = re.compile(r'\s*19|20[0-9]{2}\s*')
+simple_vin_reg_expr = re.compile('(&nbsp;)*\s*(\(6\)|⑥)(&nbsp;)*\s*(VIN|차대번호).*?')
+vin_value_reg_expr = re.compile(r'\s*([A-Z0-9]{15,20})\s*')
+simple_drive_reg_expr = re.compile('(&nbsp;)*\s*(\(9\)|⑨)(&nbsp;)*\s*(Двигатель|원동기형식).*?')
+drive_value_reg_expr = re.compile(r'\s*([A-Z0-9\- ]{3,12})\s*')
+# (5) Дата первоначальной регистрации
+simple_reg_date_reg_expr = re.compile('(&nbsp;)*\s*(\(5\)|⑤)(&nbsp;)*\s*(Дата первоначальной регистрации|최초등록일).*?')
+reg_date_value_reg_expr = re.compile(r'\s*19|20[0-9]{2}\s*[\.\-/\\]\s*[0-9]{2}\s*[\.\-/\\]\s*[0-9]{2}\s*')
 
 
-def extract_vin(text):
-    match = vin_reg_expr.findall(text)
-    if match:
-        return match[0][2]
-    else:
-        return None
-
-
-def extract_driven(text):
-    match = drive_reg_expr.findall(text)
-    if match:
-        return match[0][2]
-    else:
-        return None
-
-
-def extract_year(text):
-    match = year_reg_expr.findall(text)
-    if match:
-        return match[0][2]
-    else:
-        return None
-
-
-def process_year_creation(records, start_index, max_index):
-    year = None
-    while start_index < max_index:
-        elements = records[start_index].find_all()
-        if elements[0].text.strip() == '(3) 연식':
-            elements[0].string = '(3) Год производства'
-            year = elements[1].text.strip()
-            break
-        elif elements[0].text.strip() == '(3) Год производства':
-            year = elements[1].text.strip()
-            break
-        start_index += 1
-    return start_index + 1, year
-
-
-def process_vin_code(records, start_index, max_index):
-    vin = None
-    while start_index < max_index:
-        elements = records[start_index].find_all()
-        if elements[0] and elements[0].text:
-            if elements[0].text.strip() == '(6) 차대번호':
-                elements[0].string = '(6) VIN Код'
-                vin = elements[1].text.strip()
+def neighbour_data_extractor(soup, pattern, data_pattern):
+    data = None
+    result = soup.find_all(text=pattern)
+    if not result:
+        result = soup.find_all(string=pattern)
+    if result:
+        if isinstance(result[0], NavigableString):
+            tag = result[0].parent
+        else:
+            tag = result[0]
+        count = 0
+        parent_tag = tag
+        while parent_tag.name != 'tr':
+            parent_tag = parent_tag.parent
+            count += 1
+            if count > 3:
+                parent_tag = None
                 break
-            elif elements[0].text.strip() == '(6) VIN Код':
-                vin = elements[1].text.strip()
-                break
-        start_index += 1
-    return start_index + 1, vin
+        if parent_tag:
+            current_find = False
+            for sub_tag in parent_tag.findAll():
+                if current_find:
+                    if sub_tag.contents and len(sub_tag.contents) > 1:
+                        finde_tag = sub_tag.find(text=data_pattern)
+                        if finde_tag:
+                            data = finde_tag.string.strip()
+                        else:
+                            finde_tag = sub_tag.find(string=data_pattern)
+                            if finde_tag:
+                                data = finde_tag.string.strip()
+                            else:
+                                if data_pattern.match(sub_tag.text):
+                                    data = sub_tag.text.strip()
+                                else:
+                                    print(sub_tag.text.strip())
+                    else:
+                        data = sub_tag.string.strip()
+                    break
+                if sub_tag == tag:
+                    current_find = True
+    return data
 
 
-def process_fuel(records, start_index, max_index):
-    vin = None
-    while start_index < max_index:
-        elements = records[start_index].find_all()
-        if elements[0].text.strip() == '(8) 사용연료':
-            elements[0].string = '(8) Тип топлива'
-            sub_elements = elements[1].find_all(text=True)
-            sub_elements[1].replace_with(NavigableString('Бензин'))
-            sub_elements[2].replace_with(NavigableString('Дизель'))
-            sub_elements[3].replace_with(NavigableString('Газ (LPG)'))
-            sub_elements[4].replace_with(NavigableString('Гибридный'))
-            sub_elements[5].replace_with(NavigableString('Электро'))
-            sub_elements[6].replace_with(NavigableString('Водород'))
-            sub_elements[7].replace_with(NavigableString('Другой'))
-            break
-        elif elements[0].text.strip() == '(8) Тип топлива':
-            break
-        start_index += 1
-    return start_index + 1
+def extractor(content):
+    soup = BeautifulSoup(content, 'html.parser')
+    year = neighbour_data_extractor(soup, simple_year_reg_expr, year_value_reg_expr)
+    vin = neighbour_data_extractor(soup, simple_vin_reg_expr, vin_value_reg_expr)
+    drive = neighbour_data_extractor(soup, simple_drive_reg_expr, drive_value_reg_expr)
+    red_date = neighbour_data_extractor(soup, simple_reg_date_reg_expr, reg_date_value_reg_expr)
 
+    if year:
+        try:
+            year = int(year)
+        except ValueError:
+            year = None
 
-def process_first(records, start_index, max_index):
-    while start_index < max_index:
-        elements = records[start_index].find_all()
-        if elements[0].text.strip() == '(1) 차명':
-            elements[0].string = '(1) Модель'
-            if elements[3].text.strip() == '(2)자동차등록번호':
-                elements[3].string = '(2) Регистрационный номер'
-        elif elements[0].text.strip() == '(1) Модель':
-            break
-        start_index += 1
-    return start_index + 1
+    if red_date:
+        date_str = re.sub(r'[\\ \.\-\/]+', '-', red_date)
+        try:
+            red_date = datetime.strptime(date_str, '%Y-%m-%d')
+        except ValueError:
+            red_date = None
 
+    result = (year, vin, drive, red_date)
 
-def process_drive(records, start_index, max_index):
-    drive = None
-    while start_index < max_index:
-        elements = records[start_index].find_all()
-        if elements[0].text.strip() == '(9) 원동기형식':
-            elements[0].string = '(9) Двигатель'
-            drive = elements[1].text.strip()
-            if elements[2].text.strip() == '(10) 보증유형':
-                elements[2].string = '(10) Тип гарантии'
-                sub_elements = elements[3].find_all(text=True)
-
-                sub_elements[1].replace_with(NavigableString('Самостоятельная гарантия'))
-                sub_elements[2].replace_with(NavigableString('Гарантия страховой компании'))
-            if elements[6].text.strip() == '가격산정 기준가격':
-                elements[6].string = 'База для расчета цены'
-            if elements[8].text.strip() == '만원':
-                elements[8].string = 'Десять тысяч вон'
-            break
-        elif elements[0].text.strip() == '(9) Двигатель':
-            drive = elements[1].text.strip()
-            break
-        start_index += 1
-    return start_index + 1, drive
-
-
-def process_first_registration(records, start_index, max_index):
-    reg_date = None
-    while start_index < max_index:
-        elements = records[start_index].find_all()
-        if elements[0].text.strip() == '(5) 최초등록일':
-            elements[0].string = '(5) Дата первоначальной регистрации'
-            reg_date = elements[1].text.strip()
-            if elements[2].text.strip() == '(7) 변속기':
-                elements[2].string = '(7) Трансмиссия'
-                sub_elements = elements[3].find_all(text=True)
-
-                sub_elements[1].replace_with(NavigableString('Автоматическая'))
-                sub_elements[2].replace_with(NavigableString('Ручная'))
-                sub_elements[3].replace_with(NavigableString('Полуавтоматическая'))
-                sub_elements[4].replace_with(NavigableString('Бесступенчатая трансмиссия'))
-                sub_elements[5].replace_with(NavigableString('Другое ()'))
-            break
-        elif elements[0].text.strip() == '(5) Дата первоначальной регистрации':
-            reg_date = elements[1].text.strip()
-            break
-        start_index += 1
-    return start_index + 1, reg_date
+    return result
 
 
 def process_report_file(path, dir, translator, can_save=True, replace_standart=True):
@@ -161,66 +92,13 @@ def process_report_file(path, dir, translator, can_save=True, replace_standart=T
         try:
             with open(file_path, 'r', encoding='utf8') as file:
                 content = file.read()
-                vin = extract_vin(content)
-                drive = extract_driven(content)
+                year, vin, drive, red_date = extractor(content)
             if can_save:
-                with open(file_path, "wb") as f_output:
-                    f_output.write(translate_report_content(content))
-
-            return vin, drive, None, None
-        except Exception as e:
-            print(f'ERROR in add.html dir {dir} {e}')
-    else:
-        print(f'ERROR NO FILE add.html in {dir}')
-    return None, None, None, None
-
-
-def process_report_file2(path, dir, translator, can_save=True, replace_standart=True):
-    file_path = os.path.abspath(os.path.join(path, dir, 'add.html'))
-    if os.path.exists(file_path) and os.path.isfile(file_path):
-        try:
-            with open(file_path, 'r', encoding='utf8') as file:
-                content = file.read()
-            if replace_standart:
-                replacer = {
-                    '만원': ' дес. тыс. Вон',
-                    '없음': 'Нет',
-                    '있음': 'Есть',
-                    '양호': 'Хорошо',
-                    '불량': 'Плохо',
-                    '미세누유': 'Микропротекание',
-                    '누유': 'Утечка',
-                    '적정': 'Адекватно',
-                    '부족': 'Мало',
-                    '과다': 'Много',
-
-                }
-                for key, val in replacer.items():
-                    content = content.replace(key, val)
-                    # content = content.replace('만원', ' дес. тыс. Вон').replace('없음', 'Нет').replace('있음', 'Есть')
-            soup = BeautifulSoup(content, 'html.parser')
-            records = soup.find_all('tr')
-            index = 0
-            table_1 = soup.find('table', attrs={
-                'title': '자동차 기본정보'
-            })
-            if table_1:
-                records = table_1.find_all('tr')
-                size = len(records)
-                index = process_first(records, 0, size)
-                index, year = process_year_creation(records, index, size)
-                index, reg_date = process_first_registration(records, index, size)
-                index, vin = process_vin_code(records, index, size)
-                if vin is None:
-                    print('NO VIN: ' + dir)
-                index = process_fuel(records, index, size)
-                index, drive = process_drive(records, index, size)
-
-                if can_save:
-                    with open(file_path, "wb") as f_output:
-                        f_output.write(soup.prettify("utf-8"))
-
-                return vin, datetime.strptime(reg_date.strip().replace('.', '-'), '%Y-%m-%d'), int(year), drive
+                with open(file_path, "w", encoding='utf8') as f_output:
+                    translated_content = translate_report_content(content)
+                    print(content)
+                    f_output.write(translated_content)
+            return vin, red_date, year, drive
         except Exception as e:
             print(f'ERROR in add.html dir {dir} {e}')
     else:

@@ -5,8 +5,19 @@ from django.shortcuts import render
 from django.views.generic import DetailView
 
 from list_auto.models import Car, BodyType, Brand
-from vue_utils.views import FilterListView
+from vue_utils.views import FilterListView, FilterAjaxListView
 
+
+class CarListViewAjax(FilterAjaxListView):
+    model = Car
+    paginate_by = 5
+    viewed_fields = [
+        'year',
+        {
+            'field_name': 'model_version__body_type__id',
+            'convertor': 'int'
+        },
+    ]
 
 class CarListView(FilterListView):
     model = Car
