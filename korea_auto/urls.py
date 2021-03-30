@@ -22,6 +22,7 @@ from korea_auto import settings
 
 urlpatterns = [
                   path('admin/', admin.site.urls),
-                  path('', include('list_auto.urls'))
+                  path('', include('list_auto.urls')),
+                  path('ajax/', include('list_auto.ajax_urls'))
               ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 urlpatterns += staticfiles_urlpatterns()

@@ -18,22 +18,22 @@ def get_from_request(request, request_param_name, default_value=None, raise_exce
         return None
 
 
-def todict(obj, classkey=None):
+def to_dict(obj, class_key=None):
     if isinstance(obj, dict):
         data = {}
         for (k, v) in obj.items():
-            data[k] = todict(v, classkey)
+            data[k] = to_dict(v, class_key)
         return data
     elif hasattr(obj, "_ast"):
-        return todict(obj._ast())
+        return to_dict(obj._ast())
     elif hasattr(obj, "__iter__") and not isinstance(obj, str):
-        return [todict(v, classkey) for v in obj]
+        return [to_dict(v, class_key) for v in obj]
     elif hasattr(obj, "__dict__"):
-        data = dict([(key, todict(value, classkey))
+        data = dict([(key, to_dict(value, class_key))
                      for key, value in obj.__dict__.items()
                      if not callable(value) and not key.startswith('_')])
-        if classkey is not None and hasattr(obj, "__class__"):
-            data[classkey] = obj.__class__.__name__
+        if class_key is not None and hasattr(obj, "__class__"):
+            data[class_key] = obj.__class__.__name__
         return data
     else:
         return obj
@@ -44,7 +44,7 @@ def standart_serializer(list_object):
 
 
 def dict_serializer(list_object):
-    return [todict(obj) for obj in list_object]
+    return [to_dict(obj) for obj in list_object]
 
 
 def process_paging(request, objects, default_page_size='25', serializer=dict_serializer):
@@ -107,6 +107,20 @@ def standard_value_converter(value, converter, ignore_conversion_error=True, def
     return converted_value
 
 
+# Метод производит генерацию словаря для фильтрации из данных формы полученной GET или POST запросом
+#  request - объект Request из запроса
+# filter_list - описание полей в форме сиска содержащего строки с именами полей или словарь с полями
+# dict(    'field_name' - имя поля
+#          'field_action' - действие фильтрации icontains, equal, .... (не обязательное)
+#          'form_field_name' - имя поля в форме (не обязательное)
+#          'form_field_converter' - преобразователь занчений формы (конвенртор) (не обязательное)
+# )
+# или tuple со значениями
+# tuple(   имя поля,
+#          действие фильтрации icontains, equal, ...., (не обязательное)
+#          имя поля в форме, (не обязательное)
+#          преобразователь занчений формы (конвенртор) (не обязательное)
+# )
 def form_filter_dict(request, filter_list, default_filter_action='icontains'):
     if filter_list:
         filter_dict = {}
@@ -122,14 +136,13 @@ def form_filter_dict(request, filter_list, default_filter_action='icontains'):
                 filter_action = default_filter_action
 
             elif isinstance(filter_field_name, Dict) or isinstance(filter_field_name, Iterable):
-                if 'field_name' in filter_field_name:
-                    current_field, filter_action, form_field_name, form_field_converter = get_from_container(
-                        filter_field_name, [
-                            ('field_name', None),
-                            ('field_action', default_filter_action),
-                            ('form_field_name', None),
-                            ('form_field_converter', None),
-                        ])
+                current_field, filter_action, form_field_name, form_field_converter = get_from_container(
+                    filter_field_name, [
+                        ('field_name', None),
+                        ('field_action', default_filter_action),
+                        ('form_field_name', None),
+                        ('form_field_converter', None),
+                    ])
             if form_field_name is None:
                 form_field_name = current_field
 

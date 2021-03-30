@@ -4,7 +4,7 @@ from django.shortcuts import render
 from django.views.generic import ListView
 from importlib._common import _
 
-from vue_utils.utils import form_filter_dict, get_from_container, standard_value_converter
+from vue_utils.utils import form_filter_dict, get_from_container, standard_value_converter, get_from_request
 
 
 def view_test(request):
@@ -34,7 +34,7 @@ class FilterListView(ListView):
     additional_static_attribute = {}
     filter_form_values = {}
     # Поля для отображения (список имен)
-    viewed_fields = []
+    viewed_fields = None
 
     def get_additional_context_attribute(self):
         return {}
@@ -86,6 +86,9 @@ class FilterAjaxListView(FilterListView):
     # tuple(   имя поля,
     #          преобразователь занчений формы (конвенртор)
     # )
+
+    incorrect_page_as_empty_list = True
+
     def standard_serializer(self, current_obj):
         if self.viewed_fields is None and self.model:
             self.viewed_fields = [field_def.name for field_def in self.model._meta.fields]
@@ -133,10 +136,19 @@ class FilterAjaxListView(FilterListView):
 
         context = {}
         if page_size:
-            paginator, page, queryset, is_paginated = self.paginate_queryset(self.object_list, page_size)
-            context['data_list'] = page.object_list
-            context['page_count'] = paginator.num_pages
-            context['page'] = page.number
+            try:
+                paginator, page, queryset, is_paginated = self.paginate_queryset(self.object_list, page_size)
+                context['data_list'] = page.object_list
+                context['page_count'] = paginator.num_pages
+                context['page'] = page.number
+            except Http404 as e404:
+                if self.incorrect_page_as_empty_list:
+                    context['data_list'] = []
+                    count = self.object_list.count()
+                    context['page_count'] = count % page_size + 1
+                    context['page'] = get_from_request(request, 'page', 0)
+                else:
+                    raise e404
         else:
             context['data_list'] = self.object_list
 

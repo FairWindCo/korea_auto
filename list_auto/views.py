@@ -4,7 +4,7 @@ from django.shortcuts import render
 # Create your views here.
 from django.views.generic import DetailView
 
-from list_auto.models import Car, BodyType, Brand
+from list_auto.models import Car, BodyType, Brand, CarModel
 from vue_utils.views import FilterListView, FilterAjaxListView
 
 
@@ -18,6 +18,20 @@ class CarListViewAjax(FilterAjaxListView):
             'convertor': 'int'
         },
     ]
+
+
+class BrandListViewAjax(FilterAjaxListView):
+    model = Brand
+    paginate_by = 5
+    viewed_fields = ['id', 'name']
+
+
+class ModelsListViewAjax(FilterAjaxListView):
+    model = CarModel
+    paginate_by = 10
+    filters_fields = [('brand__id', None)]
+    viewed_fields = ['id', 'name']
+
 
 class CarListView(FilterListView):
     model = Car
