@@ -12,6 +12,8 @@
     <title>{% block title %}Мониторинговый центр{% endblock %}</title>
     {% block css_header_content %}
         <!-- import CSS -->
+        {% block css_header_extend_pre %}
+        {% endblock %}
         {% block css_header_primevue %}
             <link rel="stylesheet" href="{% static 'vue_utils/prime-icons/primeicons.css' %}">
             <link rel="stylesheet" href="{% static 'vue_utils/primevue/css/primevue.min.css' %}">

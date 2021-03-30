@@ -75,3 +75,12 @@ def index(request):
         'car_body': car_body,
         'car_list': cars,
     })
+
+
+def search_app_index(request):
+    car_body = BodyType.objects.all()
+    cars = Car.objects.order_by('-created').order_by().all()[:5]
+    return render(request, 'list_auto/search_app.html', {
+        'car_body': car_body,
+        'car_list': cars,
+    })
