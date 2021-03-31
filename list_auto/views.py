@@ -11,18 +11,34 @@ from vue_utils.views import FilterListView, FilterAjaxListView
 class CarListViewAjax(FilterAjaxListView):
     model = Car
     paginate_by = 5
-    viewed_fields = [
-        'year',
-        {
-            'field_name': 'model_version__body_type__id',
-            'convertor': 'int'
-        },
-    ]
+    serialized_fields = ['model_version', 'year', 'get_price', 'car_code', 'ge_thb_image']
+    filters_fields = [('year', 'gte', 'start_year', 'int'),
+                      ('year', 'lte', 'end_year', 'int'),
+                      {
+                          'field_name': 'model_version__body_type__id',
+                          'field_action': 'in',
+                          'form_field_name': 'body',
+                          'value_as_filter': False,
+                      },
+                      ('model_version__model_version__brand__id', '', 'brand', 'int'),
+                      ]
+    # viewed_fields = [
+    #     'year',
+    #     {
+    #         'field_name': 'model_version__body_type__id',
+    #         'convertor': 'int'
+    #     },
+    # ]
 
 
 class BrandListViewAjax(FilterAjaxListView):
     model = Brand
-    paginate_by = 5
+    viewed_fields = ['id', 'name']
+    filters_fields = [('name', "icontains", 'brand')]
+
+
+class BodyTypeListViewAjax(FilterAjaxListView):
+    model = BodyType
     viewed_fields = ['id', 'name']
 
 
@@ -52,7 +68,7 @@ class CarListView(FilterListView):
             'field_action': '',
             'form_field_name': 'brand',
             'form_field_converter': 'int'
-        }
+        },
     ]
 
     def get_additional_context_attribute(self):

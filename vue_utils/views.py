@@ -4,7 +4,8 @@ from django.shortcuts import render
 from django.views.generic import ListView
 from importlib._common import _
 
-from vue_utils.utils import form_filter_dict, get_from_container, standard_value_converter, get_from_request
+from vue_utils.utils import form_filter_dict, get_from_container, get_from_request, \
+    my_serializer
 
 
 def view_test(request):
@@ -17,7 +18,8 @@ class FilterListView(ListView):
     # Список из:
     # str - название поля
     # dict(    'field_name' - имя поля
-    #          'field_action' - действие фильтрации icontains, equal, ....
+    #          'field_action' - действие фильтрации icontains, exact, iexact, contains, in, gt, gte, lt, lte, ....
+    # https://docs.djangoproject.com/en/3.1/ref/models/querysets/#id4
     #          'form_field_name' - имя поля в форме
     #          'form_field_converter' - преобразователь занчений формы (конвенртор)
     # )
@@ -63,7 +65,8 @@ class FilterListView(ListView):
                 print(filter_def, self.filter_form_values)
                 list_objects = list_objects.filter(**filter_def)
         if self.viewed_fields:
-            view_field_desc = [get_from_container(field_name, [('field_name', None)], True)[0] for field_name in self.viewed_fields]
+            view_field_desc = [get_from_container(field_name, [('field_name', None)], True)[0] for field_name in
+                               self.viewed_fields]
             list_objects = list_objects.values(*view_field_desc)
         return list_objects
 
@@ -86,29 +89,9 @@ class FilterAjaxListView(FilterListView):
     # tuple(   имя поля,
     #          преобразователь занчений формы (конвенртор)
     # )
-
     incorrect_page_as_empty_list = True
-
-    def standard_serializer(self, current_obj):
-        if self.viewed_fields is None and self.model:
-            self.viewed_fields = [field_def.name for field_def in self.model._meta.fields]
-        result = {}
-
-        for field_desc in self.viewed_fields:
-            field_name, convertor = get_from_container(field_desc, [
-                        ('field_name', None),
-                        ('convertor', None)
-                    ], True)
-            current_val = None
-            if hasattr(current_obj, field_name):
-                current_val = getattr(current_obj,field_name)
-            elif field_name in current_obj:
-                current_val = current_obj[field_name]
-            if current_val:
-                result[field_name] = standard_value_converter(current_val, convertor, False, True)
-            else:
-                result[field_name] = None
-        return result
+    serialized_fields = None
+    standard_serializer = None
 
     def get(self, request, *args, **kwargs):
         self.last_request = request
@@ -128,8 +111,22 @@ class FilterAjaxListView(FilterListView):
                 raise Http404(_('Empty list and “%(class_name)s.allow_empty” is False.') % {
                     'class_name': self.__class__.__name__,
                 })
-        serializer = self.standard_serializer
-        if hasattr(self.model, 'serializer'):
+        serializer = my_serializer
+
+        viewed_fields = None
+        serialized_fields = None
+
+        if self.viewed_fields is None and self.model:
+            viewed_fields = [field_def.name for field_def in self.model._meta.fields]
+
+        if self.serialized_fields is None:
+            serialized_fields = viewed_fields
+        else:
+            serialized_fields = self.serialized_fields
+
+        if self.standard_serializer:
+            serializer = self.standard_serializer
+        elif hasattr(self.model, 'serializer'):
             serializer = self.model.serializer
 
         page_size = self.get_paginate_by(self.object_list)
@@ -138,6 +135,8 @@ class FilterAjaxListView(FilterListView):
         if page_size:
             try:
                 paginator, page, queryset, is_paginated = self.paginate_queryset(self.object_list, page_size)
+                count = self.object_list.count()
+                context['data_count'] = count
                 context['data_list'] = page.object_list
                 context['page_count'] = paginator.num_pages
                 context['page'] = page.number
@@ -145,6 +144,7 @@ class FilterAjaxListView(FilterListView):
                 if self.incorrect_page_as_empty_list:
                     context['data_list'] = []
                     count = self.object_list.count()
+                    context['data_count'] = count
                     context['page_count'] = count % page_size + 1
                     context['page'] = get_from_request(request, 'page', 0)
                 else:
@@ -153,7 +153,7 @@ class FilterAjaxListView(FilterListView):
             context['data_list'] = self.object_list
 
         if serializer:
-            context['data_list'] = [serializer(data_object) for data_object in context['data_list']]
+            context['data_list'] = [serializer(data_object, serialized_fields) for data_object in context['data_list']]
 
         add_context = self.get_additional_context_attribute()
         if add_context:

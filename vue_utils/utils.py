@@ -7,13 +7,22 @@ from django.core.paginator import Paginator
 def get_from_request(request, request_param_name, default_value=None, raise_exception=False):
     if request_param_name and request:
         if request.GET and request_param_name in request.GET:
+            print(request.GET)
             return request.GET.get(request_param_name)
         elif request.POST and request_param_name in request.POST:
             return request.POST.get(request_param_name)
-        elif raise_exception:
-            raise ValueError(f'Param {request_param_name} not found in request')
-        else:
-            return default_value
+        elif not request_param_name.endswith('[]'):
+            request_param_name = request_param_name + '[]'
+            if request.GET and request_param_name in request.GET:
+                print(request.GET)
+                return request.GET.getlist(request_param_name)
+            elif request.POST and request_param_name in request.POST:
+                return request.POST.getlist(request_param_name)
+            else:
+                if raise_exception:
+                    raise ValueError(f'Param {request_param_name} not found in request')
+                else:
+                    return default_value
     else:
         return None
 
@@ -39,7 +48,34 @@ def to_dict(obj, class_key=None):
         return obj
 
 
-def standart_serializer(list_object):
+def my_serializer(current_obj, serialized_fields, deep_serialized_fields=True, exec_method=True):
+    result = {}
+    if serialized_fields and isinstance(current_obj, dict) or hasattr(current_obj, "__dict__"):
+        for field_desc in serialized_fields:
+            field_name, convertor = get_from_container(field_desc, [
+                ('field_name', None),
+                ('convertor', None)
+            ], True)
+            current_val = None
+            if hasattr(current_obj, field_name):
+                current_val = getattr(current_obj, field_name)
+            elif field_name in current_obj:
+                current_val = current_obj[field_name]
+
+            if exec_method and callable(current_val):
+                current_val = current_val()
+
+            if current_val:
+                result[field_name] = standard_value_converter(current_val, convertor, False, True,
+                                                              deep_serialized_fields)
+            else:
+                result[field_name] = None
+    else:
+        result = to_dict(current_obj)
+    return result
+
+
+def standard_serializer(list_object):
     return serializers.serialize('json', list_object)
 
 
@@ -60,7 +96,8 @@ def process_paging(request, objects, default_page_size='25', serializer=dict_ser
     }
 
 
-def get_from_container(container, field_list_with_default_values: List[Tuple[str, any]], use_container_as_value=False):
+def get_from_container(container, field_list_with_default_values: List[Tuple[str, any]], use_container_as_value=False,
+                       ignore_iterable=False):
     result = []
     if isinstance(container, str) and use_container_as_value:
         result = [def_value for field_name, def_value in field_list_with_default_values]
@@ -68,7 +105,7 @@ def get_from_container(container, field_list_with_default_values: List[Tuple[str
     elif isinstance(container, Dict):
         for field_name, def_value in field_list_with_default_values:
             result.append(container.get(field_name, def_value))
-    elif isinstance(container, Iterable):
+    elif not ignore_iterable and isinstance(container, Iterable):
         result = [def_value for field_name, def_value in field_list_with_default_values]
         for index, value_for_field in enumerate(container[:len(result)]):
             result[index] = value_for_field
@@ -80,7 +117,8 @@ def get_from_container(container, field_list_with_default_values: List[Tuple[str
     return result
 
 
-def standard_value_converter(value, converter, ignore_conversion_error=True, default_converter_to_str=False):
+def standard_value_converter(value, converter, ignore_conversion_error=True, default_converter_to_str=False,
+                             default_convert_to_dict=True):
     if value is not None and converter:
         try:
             if callable(converter):
@@ -90,6 +128,9 @@ def standard_value_converter(value, converter, ignore_conversion_error=True, def
                     converted_value = int(value)
                 elif converter == 'float':
                     converted_value = float(value)
+                elif converter.startswith() == 'serialize':
+                    field_def = converter[9:-1].split(',')
+                    converted_value = my_serializer(value, field_def)
                 else:
                     converted_value = str(value)
         except ValueError as err:
@@ -102,6 +143,8 @@ def standard_value_converter(value, converter, ignore_conversion_error=True, def
     else:
         if default_converter_to_str:
             converted_value = str(value)
+        elif default_convert_to_dict:
+            converted_value = to_dict(value)
         else:
             converted_value = value
     return converted_value
@@ -114,6 +157,7 @@ def standard_value_converter(value, converter, ignore_conversion_error=True, def
 #          'field_action' - действие фильтрации icontains, equal, .... (не обязательное)
 #          'form_field_name' - имя поля в форме (не обязательное)
 #          'form_field_converter' - преобразователь занчений формы (конвенртор) (не обязательное)
+#          'filter_as_value' - указывать разбирать значение формы как пару значение формы и действие
 # )
 # или tuple со значениями
 # tuple(   имя поля,
@@ -126,6 +170,7 @@ def form_filter_dict(request, filter_list, default_filter_action='icontains'):
         filter_dict = {}
         form_values = {}
         form_field_converter = None
+        value_as_filter = True
         for filter_field_name in filter_list:
             current_field = None
             form_field_name = None
@@ -136,12 +181,13 @@ def form_filter_dict(request, filter_list, default_filter_action='icontains'):
                 filter_action = default_filter_action
 
             elif isinstance(filter_field_name, Dict) or isinstance(filter_field_name, Iterable):
-                current_field, filter_action, form_field_name, form_field_converter = get_from_container(
+                current_field, filter_action, form_field_name, form_field_converter, value_as_filter = get_from_container(
                     filter_field_name, [
                         ('field_name', None),
                         ('field_action', default_filter_action),
                         ('form_field_name', None),
                         ('form_field_converter', None),
+                        ('value_as_filter', True),
                     ])
             if form_field_name is None:
                 form_field_name = current_field
@@ -152,7 +198,7 @@ def form_filter_dict(request, filter_list, default_filter_action='icontains'):
                     current_value, filter_action = get_from_container(value, [
                         ('value', None),
                         ('action', filter_action)
-                    ], True)
+                    ], True, ignore_iterable=not value_as_filter)
                 else:
                     current_value = value
                 current_value = standard_value_converter(current_value, form_field_converter)

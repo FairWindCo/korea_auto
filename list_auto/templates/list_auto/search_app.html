@@ -4,4 +4,224 @@
 {% load define_action %}
 
 {% block main_content_block %}
+    {#  ВНИМАНИЕ АТРИБУТЫ ВРОДЕ useGrouping и totalRecords должны записыватся use-grouping  total-records#}
+    <p-Splitter class="empty-background">
+        <p-SplitterPanel class="p-d-flex p-ai-top p-jc-right empty-background" :size="30">
+            <p-Card style="width: 100%; background: rgba(0,0,0,0); color: white;">
+                <template #title>
+                    Параметры поиска
+                </template>
+                <template #content>
+                    <div class="p-fluid p-grid p-formgrid">
+                        <div class="p-field p-col-12 p-md-6">
+                            <label for="start_year">Не ранее</label>
+                            <p-InputNumber id="start_year" v-model="start_year" :use-grouping="false" :min="min_year"
+                                           :max="max_year"/>
+
+                        </div>
+                        <div class="p-field p-col-12 p-md-6">
+                            <label for="end_year">Не позднее</label>
+                            <p-InputNumber id="end_year" v-model="end_year" :use-grouping="false" :min="min_year"
+                                           :max="max_year"/>
+
+                        </div>
+                        <div class="p-field p-col-12">
+                            <p-Slider v-model="year_range" :range="true" :min="min_year" :max="max_year"/>
+                        </div>
+                        <div class="p-field p-col-12" v-if="brands">
+                            <label for="brand_select">Производитель</label>
+                            <p-Dropdown v-model="selectedBrand" :options="brands" option-label="name" option-value="id" :filter="true"
+                                        @filter="onBrandFilter"
+                                        placeholder="Выбирите Бренд" :show-clear="true" id="brand_select">
+                            </p-Dropdown>
+                        </div>
+                        <div class="p-field p-col-12" v-if="body_types">
+                            <label for="body_select">Кузов</label>
+                            <p-Listbox  v-model="selectedBody" :options="body_types" option-label="name" option-value="id"
+                                        placeholder="Выбирите Кузов" id="body_select" :multiple="true">
+                            </p-Listbox>
+                        </div>
+                    </div>
+                    <p-Button icon="pi pi-check" label="Поиск" @click="getCars"/>
+                </template>
+            </p-Card>
+        </p-SplitterPanel>
+        <p-SplitterPanel class="p-d-flex p-ai-center p-jc-center empty-background" :size="70">
+            <p-DataView :value="cars" :paginator="true" :rows="9" :total-records="totalCars"
+                        :layout="layout" :sortOrder="sortOrder" :sortField="sortField"
+                        @page="onCarPage"
+                        :lazy="true" style="width: 100%; height: 100%;">
+                <template #header>
+                    <div class="p-grid p-nogutter">
+                        <div class="p-col-6" style="text-align: left">
+                            <Dropdown v-model="sortKey" :options="sortOptions" optionLabel="label"
+                                      placeholder="Sort By Price" @change="onSortChange($event)"/>
+                        </div>
+                        <div class="p-col-6" style="text-align: right">
+                            <DataViewLayoutOptions v-model="layout"/>
+                        </div>
+                    </div>
+                </template>
+
+                <template #list="slotprops">
+                    <div class="p-col-12">
+                        <div class="product-list-item">
+                            <div class="product-list-detail">
+                                <div class="product-name">@{ slotprops.data.model_version }@</div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+
+                <template #grid="slotprops">
+                    <div class="p-col-12 p-md-12">
+                        <div class="product-grid-item card">
+                            <div class="product-grid-item-top">
+                                <div>
+
+                                    <span class="product-category">name: @{ slotprops.data.model_version }@</span>
+
+                                </div>
+                            </div>
+                            <div class="product-grid-item-content p-d-flex">
+                                <div class="p-col-4">
+                                    <img :src="slotprops.data.ge_thb_image" style="width: 100%;">
+                                </div>
+                                <div class="p-col-8">
+                                    @{ slotprops }@
+                                </div>
+                            </div>
+                            <div class="product-grid-item-bottom  p-d-flex">
+                                <div class="p-col-8">
+                                <span class="product-price">
+                                    <svg class="icon-svg dollar"
+                                         xmlns:xlink="http://www.w3.org/1999/xlink">
+                                        <use xlink:href="{% static 'assert/dollars_money.svg' %}#dollars"
+                                             href="{% static 'assert/dollars_money.svg' %}#dollars">
+                                        </use>
+                                    </svg>
+                                    @{ slotprops.data.get_price }@  ₩</span>
+                                </div>
+                                <div class="p-col-4 p-text-right">
+                                    <p-Button icon="pi pi-info"></p-Button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </template>
+            </p-DataView>
+        </p-SplitterPanel>
+    </p-Splitter>
+{% endblock %}
+
+
+{% block vue_app_config %}
+    <script>
+        const APP_CONFIG = {
+            data() {
+                return {
+                    start_year: 2000,
+                    end_year: {% now 'Y' %},
+                    min_year: 1990,
+                    max_year: {% now 'Y' %},
+                    cars: [],
+                    brands: [],
+                    body_types:[],
+                    selectedBrand: null,
+                    selectedBody:null,
+                    totalCars: 0,
+                    layout: 'grid',
+                    sortKey: null,
+                    sortOrder: null,
+                    sortField: null,
+                    sortOptions: [
+                        {label: 'Price High to Low', value: '!price'},
+                        {label: 'Price Low to High', value: 'price'},
+                    ],
+                    current_page: 1,
+                    page_per_row: 5,
+                }
+            },
+            computed: {
+                year_range: {
+                    get: function () {
+                        let value = [this.start_year, this.end_year]
+                        return value
+                    },
+                    set: function (newValue) {
+                        this.start_year = newValue[0]
+                        this.end_year = newValue[1]
+                    }
+                }
+            },
+            watch: {},
+            mounted() {
+                this.getCars();
+                this.getBrands();
+                this.getBodyTypes();
+            },
+            methods: {
+                onBrandFilter(event){
+                  this.getBrands(event.value)
+                },
+                onCarPage(event) {
+                    this.page = event.page + 1
+                    this.getCars()
+                },
+                getCars: function () {
+                    const vm = this
+                    console.log('FETCH CARS')
+                    axios.get('{% url 'car_list_ajax' %}', {
+                        params: {
+                            page: vm.page,
+                            start_year: vm.start_year,
+                            end_year: vm.end_year,
+                            brand: vm.selectedBrand,
+                            body: vm.selectedBody,
+                        }
+                    })
+                        .then(function (response) {
+                            console.log('FETCH CARS RESPONSE', response.data.data_list)
+                            vm.cars = response.data.data_list
+                            vm.totalCars = response.data.data_count
+                        })
+                        .catch(function (error) {
+                            console.log('FETCH CARS RESPONSE', error)
+                            vm.answer = 'Error! Could not reach the API. ' + error
+                        })
+                },
+                getBrands: function (brand_name=null) {
+                    const vm = this
+                    console.log('FETCH CARS')
+                    axios.get('{% url 'brand_list_ajax' %}', {
+                        params: {
+                            brand: brand_name,
+                        }
+                    })
+                        .then(function (response) {
+                            console.log('FETCH CARS RESPONSE', response.data.data_list)
+                            vm.brands = response.data.data_list
+                        })
+                        .catch(function (error) {
+                            console.log('FETCH CARS RESPONSE', error)
+                            vm.answer = 'Error! Could not reach the API. ' + error
+                        })
+                },
+                getBodyTypes: function () {
+                    const vm = this
+                    console.log('FETCH CARS')
+                    axios.get('{% url 'body_list_ajax' %}')
+                        .then(function (response) {
+                            console.log('FETCH CARS RESPONSE', response.data.data_list)
+                            vm.body_types = response.data.data_list
+                        })
+                        .catch(function (error) {
+                            console.log('FETCH CARS RESPONSE', error)
+                            vm.answer = 'Error! Could not reach the API. ' + error
+                        })
+                }
+            }
+        }
+        const APP_COMPONENTS = {}
+    </script>
 {% endblock %}

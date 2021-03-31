@@ -1,9 +1,12 @@
-from select import select
+import os
 
 from django.db import models
 
 
 # Create your models here.
+from korea_auto import settings
+
+
 class Brand(models.Model):
     name = models.CharField(verbose_name='Название бренда', max_length=50)
     korea_name = models.CharField(verbose_name='Корейское название бренда', max_length=100)
@@ -34,12 +37,14 @@ class CarModel(models.Model):
 
 class BodyType(models.Model):
     name = models.CharField(verbose_name='Тип кузова', max_length=50)
+
     class Meta:
         verbose_name = 'Тип кузова'
         verbose_name_plural = 'Типы кузова'
 
     def __str__(self):
         return f'{self.name}'
+
 
 class CarVersion(models.Model):
     name = models.CharField(verbose_name='Версия модели', max_length=50)
@@ -58,7 +63,7 @@ class CarVersion(models.Model):
         return f'{self.model_version} {self.name}'
 
     def get_engine_volume(self):
-        return f'{self.engine_volume/10:.1f}' if self.engine_volume is not None else None
+        return f'{self.engine_volume / 10:.1f}' if self.engine_volume is not None else None
 
 
 class CarOptions(models.Model):
@@ -146,14 +151,25 @@ class Car(models.Model):
     def __str__(self):
         return f'[{self.car_code}] {self.model_version}'
 
+    def ge_thb_image(self):
+        code = str(self.car_code)
+        path1 = os.path.join(settings.MEDIA_ROOT, code, 'ImageThumb.jpg')
+        path2 = os.path.join(settings.MEDIA_ROOT, code, 'big_image_1.jpg')
+        if os.path.exists(path1) and os.path.isfile(path1):
+            return settings.MEDIA_URL + code + '/ImageThumb.jpg'
+        elif os.path.exists(path2) and os.path.isfile(path2):
+            return settings.MEDIA_URL + code + '/big_image_1.jpg'
+        else:
+            return settings.STATIC_URL + 'assert/car.jpg'
+
     def get_price(self):
-        return (self.price if self.price>0 else self.price_dealer) * 1000
+        return (self.price if self.price > 0 else self.price_dealer) * 10000
 
     def get_image_range(self):
-        return range(1, self.image_count+1)
+        return range(1, self.image_count + 1)
 
     def get_car_images(self):
-        return [ f'{self.car_code}/big_image_{i}.jpg' for i in self.get_image_range()]
+        return [f'{self.car_code}/big_image_{i}.jpg' for i in self.get_image_range()]
 
     def get_option(self):
         return self.options.order_by('option_group', 'name').iterator()
