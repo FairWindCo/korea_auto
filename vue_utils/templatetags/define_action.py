@@ -20,7 +20,7 @@ def create_list(val=None, default_value=None, *args, **kwargs):
         val = default_value.split(',')
     elif isinstance(val, str):
         val = val.split(',')
-    print(val)
+    # print(val)
     return val
 
 
@@ -30,5 +30,5 @@ def create_default_list(val, default_value):
         val = default_value.split(',')
     elif isinstance(val, str):
         val = val.split(',')
-    print(val)
+    # print(val)
     return val

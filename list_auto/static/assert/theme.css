@@ -2,6 +2,7 @@
     color: #4288b9;
     border: 1px solid #4288b9;
 }
+
 .btn-primary:hover {
     background-color: #4288b9;
 }
@@ -154,7 +155,8 @@ svg {
     height: 1.375em;
     margin-left: .3em;
 }
-.dollar{
+
+.dollar {
     width: 1em;
     color: #86e086;
 }
@@ -236,51 +238,73 @@ svg {
     border: 1px solid #1e1e2d;
     border-radius: 3%;
 }
+
 .navbar-collapse.show {
     padding: 5px;
     background-color: #f8f9fa;
 }
 
 .m-n1 {
-  margin: -0.25rem !important;
+    margin: -0.25rem !important;
 }
 
 .m-n2 {
-  margin: -0.5rem !important;
+    margin: -0.5rem !important;
 }
-.detail_car_info{
+
+.detail_car_info {
     color: white;
 }
-.detail_car_info h3{
+
+.detail_car_info h3 {
     color: white;
     text-align: center;
 }
-.detail_car_info .icon-svg{
+
+.detail_car_info .icon-svg {
     width: 2em;
     height: 2em;
 }
 
-.short_info{
-    color:white;
+.short_info {
+    color: white;
 }
 
-.option_list{
+.option_list {
     column-count: 2;
 }
 
-.p-text-right{
+.p-text-right {
     text-align: right;
 }
 
-.p-text-left{
+.p-text-left {
     text-align: left;
 }
-ol.carousel-indicators{
+
+ol.carousel-indicators {
     position: relative;
     margin: 0px;
 }
- .carousel-indicators li {
+
+.carousel-indicators li {
     width: 200px;
     height: 100%;
     opacity: 0.8;
-  }
+}
+
+.my-text-black {
+    color: black;
+}
+
+.p-galleria-thumbnail-wrapper {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 140px;
+}
+
+.p-galleria-thumbnail-items-container {
+    width: 100%;
+}

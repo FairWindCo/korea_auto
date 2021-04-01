@@ -30,15 +30,28 @@
                         </div>
                         <div class="p-field p-col-12" v-if="brands">
                             <label for="brand_select">Производитель</label>
-                            <p-Dropdown v-model="selectedBrand" :options="brands" option-label="name" option-value="id" :filter="true"
-                                        @filter="onBrandFilter"
-                                        placeholder="Выбирите Бренд" :show-clear="true" id="brand_select">
-                            </p-Dropdown>
+                            <p-Listbox v-model="selectedBrand" :options="brands" option-label="name" option-value="id"
+                                       :filter="true"
+                                       @filter="onBrandFilter" :multiple="true" @change="onBrandSelect"
+                                       list-style="max-height:250px"
+                                       filter-placeholder="Выбирите Бренд" :show-clear="true" id="brand_select">
+                            </p-Listbox>
+                        </div>
+                        <div class="p-field p-col-12" v-if="(models && models.length>0) || models_filter">
+                            <label for="model_select">Модель</label>
+                            <p-MultiSelect v-model="selectedModel" :options="models" option-label="name"
+                                           option-value="id" :filter="true" class="my-text-black"
+                                           style="max-width: 300px;"
+                                           @filter="onModelFilter" :multiple="true" list-style="max-height:250px;"
+                                           placeholder="Выбирите Модель" :show-clear="true" id="model_select">
+                            </p-MultiSelect>
                         </div>
                         <div class="p-field p-col-12" v-if="body_types">
                             <label for="body_select">Кузов</label>
-                            <p-Listbox  v-model="selectedBody" :options="body_types" option-label="name" option-value="id"
-                                        placeholder="Выбирите Кузов" id="body_select" :multiple="true">
+                            <p-Listbox v-model="selectedBody" :options="body_types" option-label="name"
+                                       option-value="id"
+                                       list-style="max-height:250px"
+                                       placeholder="Выбирите Кузов" id="body_select" :multiple="true">
                             </p-Listbox>
                         </div>
                     </div>
@@ -47,18 +60,23 @@
             </p-Card>
         </p-SplitterPanel>
         <p-SplitterPanel class="p-d-flex p-ai-center p-jc-center empty-background" :size="70">
-            <p-DataView :value="cars" :paginator="true" :rows="9" :total-records="totalCars"
+            <p-DataView :value="cars" :paginator="true" :rows="page_row_count" :total-records="totalCars"
                         :layout="layout" :sortOrder="sortOrder" :sortField="sortField"
                         @page="onCarPage"
                         :lazy="true" style="width: 100%; height: 100%;">
                 <template #header>
                     <div class="p-grid p-nogutter">
-                        <div class="p-col-6" style="text-align: left">
-                            <Dropdown v-model="sortKey" :options="sortOptions" optionLabel="label"
-                                      placeholder="Sort By Price" @change="onSortChange($event)"/>
+                        <div class="p-col-4" style="text-align: left">
+                            <p-Dropdown v-model="sortKey" :options="sortOptions" option-label="label"
+                                        placeholder="Sort By Price" @change="onSortChange($event)"/>
                         </div>
-                        <div class="p-col-6" style="text-align: right">
-                            <DataViewLayoutOptions v-model="layout"/>
+                        <div class="p-col-4" style="text-align: center">
+                            <p-Dropdown v-model="pageKey" :options="pageOptions" option-label="label"
+                                        placeholder="Количество товара на страницу"
+                                        @change="onPageCountChange($event)"/>
+                        </div>
+                        <div class="p-col-4" style="text-align: right">
+                            <p-DataViewLayoutOptions v-model="layout"/>
                         </div>
                     </div>
                 </template>
@@ -66,29 +84,97 @@
                 <template #list="slotprops">
                     <div class="p-col-12">
                         <div class="product-list-item">
-                            <div class="product-list-detail">
-                                <div class="product-name">@{ slotprops.data.model_version }@</div>
+                            <div class="product-list-detail p-d-flex p-flex-row p-flex-wrap">
+                                <div class="product-name p-col-12"><h5>@{ slotprops.data.model_version }@</h5></div>
+
+                                <div class="p-col-4">
+                                    <img :src="slotprops.data.ge_thb_image" style="width: 100%;"
+                                         @click="showImages(slotprops.data.car_code)">
+                                </div>
+                                <div class="p-col-8">
+                                    @{ slotprops }@
+                                </div>
                             </div>
                         </div>
                     </div>
                 </template>
 
                 <template #grid="slotprops">
-                    <div class="p-col-12 p-md-12">
+                    <div class="p-col-12 p-md-6 p-m-md-0 p-grid">
                         <div class="product-grid-item card">
                             <div class="product-grid-item-top">
                                 <div>
 
-                                    <span class="product-category">name: @{ slotprops.data.model_version }@</span>
+                                    <span class="product-category"><h5>@{ slotprops.data.model_version }@</h5></span>
 
                                 </div>
                             </div>
-                            <div class="product-grid-item-content p-d-flex">
-                                <div class="p-col-4">
-                                    <img :src="slotprops.data.ge_thb_image" style="width: 100%;">
+                            <div class="product-grid-item-content p-d-flex p-flex-wrap">
+                                <div class="p-col-24">
+                                    <img :src="slotprops.data.ge_thb_image" style="width: 100%;"
+                                         @click="showImages(slotprops.data.car_code)">
                                 </div>
-                                <div class="p-col-8">
-                                    @{ slotprops }@
+                                <div class="p-col-24 p-d-flex p-flex-wrap">
+                                    <div class="p-col-2">
+                                        <svg class="icon-svg road_m_icon" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                            <use xlink:href="{% static 'assert/dollars_money.svg' %}#engine"
+                                                 href="{% static 'assert/dollars_money.svg' %}#engine">
+                                            </use>
+                                        </svg>
+                                    </div>
+                                    <div class="p-col-4">
+                                        @{ slotprops.data.model_version__get_engine_volume }@
+                                    </div>
+                                    <div class="p-col-2">
+                                        <svg class="icon-svg road_m_icon" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                            <use xlink:href="{% static 'assert/dollars_money.svg' %}#road_a"
+                                                 href="{% static 'assert/dollars_money.svg' %}#road_a">
+                                            </use>
+                                        </svg>
+                                    </div>
+                                    <div class="p-col-4">
+                                        @{ slotprops.data.mileage }@
+                                    </div>
+                                    <div class="p-col-2">
+                                        <svg class="icon-svg road_m_icon" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                            <use xlink:href="{% static 'assert/dollars_money.svg' %}#gasoline"
+                                                 href="{% static 'assert/dollars_money.svg' %}#gasoline">
+                                            </use>
+                                        </svg>
+                                    </div>
+                                    <div class="p-col-4">
+                                        @{ slotprops.data.gasoline }@
+                                    </div>
+                                    <div class="p-col-2">
+                                        <svg class="icon-svg road_m_icon" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                            <use xlink:href="{% static 'assert/dollars_money.svg' %}#car_top"
+                                                 href="{% static 'assert/dollars_money.svg' %}#car_top">
+                                            </use>
+                                        </svg>
+                                    </div>
+                                    <div class="p-col-4">
+                                        @{ slotprops.data.model_version__body_type__name }@
+                                    </div>
+                                    <div class="p-col-2">
+                                        <svg class="icon-svg road_m_icon" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                            <use xlink:href="{% static 'assert/dollars_money.svg' %}#transmission"
+                                                 href="{% static 'assert/dollars_money.svg' %}#transmission">
+                                            </use>
+                                        </svg>
+                                    </div>
+                                    <div class="p-col-4">
+                                        @{ slotprops.data.transmission__name }@
+                                    </div>
+                                    <div class="p-col-2">
+                                        <svg class="icon-svg road_m_icon" xmlns:xlink="http://www.w3.org/1999/xlink">
+                                            <use xlink:href="{% static 'assert/dollars_money.svg' %}#calendar"
+                                                 href="{% static 'assert/dollars_money.svg' %}#calendar">
+                                            </use>
+                                        </svg>
+                                    </div>
+                                    <div class="p-col-4">
+                                        @{ slotprops.data.year }@
+                                    </div>
                                 </div>
                             </div>
                             <div class="product-grid-item-bottom  p-d-flex">
@@ -103,15 +189,42 @@
                                     @{ slotprops.data.get_price }@  ₩</span>
                                 </div>
                                 <div class="p-col-4 p-text-right">
-                                    <p-Button icon="pi pi-info"></p-Button>
+                                    <p-Button icon="pi pi-info" @click="showAdd(slotprops.data.car_code)"></p-Button>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </template>
             </p-DataView>
+
         </p-SplitterPanel>
     </p-Splitter>
+
+    <p-Dialog header="Галерея" v-model:visible="display_images" :breakpoints="{'960px': '75vw', '640px': '100vw'}"
+              :style="{width: '50vw'}">
+        <div class="p-d-flex p-flex-row p-col-12 p-jc-center p-0">
+            <p-Galleria :value="car_images" :num-visible="3" v-if="car_images && car_images.length > 0" class="p-col-20"
+                        thumbnails-position="bottom" container-style="max-width: 640px; width:70vw;"
+            >
+                <template #item="slotProps">
+                    <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
+                         style="width: 100%; display: block;"/>
+                </template>
+                <template #thumbnail="slotProps">
+                    <div class="p-grid p-nogutter p-justify-center">
+                        <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
+                             style="width: 100%; display: block;"/>
+                    </div>
+                </template>
+            </p-Galleria>
+            <p-ProgressBar mode="indeterminate" style="height: .5em"
+                           v-if="!car_images || car_images.length == 0"/>
+        </div>
+    </p-Dialog>
+    <p-Dialog header="Дополнительаня информация" v-model:visible="display_additional"
+              :breakpoints="{'960px': '75vw', '640px': '100vw'}" :style="{width: '50vw'}">
+        <component :is="dynamicContent && {template:dynamicContent}"></component>
+    </p-Dialog>
 {% endblock %}
 
 
@@ -120,23 +233,45 @@
         const APP_CONFIG = {
             data() {
                 return {
+                    display_images: false,
+                    display_additional: false,
+                    display_detail: false,
                     start_year: 2000,
                     end_year: {% now 'Y' %},
                     min_year: 1990,
                     max_year: {% now 'Y' %},
                     cars: [],
                     brands: [],
-                    body_types:[],
+                    body_types: [],
+                    models: [],
+                    page_row_count: 5,
+                    models_filter: null,
                     selectedBrand: null,
-                    selectedBody:null,
+                    selectedBody: null,
+                    selectedModel: null,
+                    car_images: ['sdfsd'],
                     totalCars: 0,
                     layout: 'grid',
                     sortKey: null,
                     sortOrder: null,
                     sortField: null,
+                    pageKey: {label: '5', value: 5},
+                    dynamicContent: '',
+                    pageOptions: [
+                        {label: '5', value: 5},
+                        {label: '10', value: 10},
+                        {label: '25', value: 25},
+                        {label: '50', value: 50},
+                    ],
                     sortOptions: [
-                        {label: 'Price High to Low', value: '!price'},
+                        {label: 'Price High to Low', value: '-price'},
                         {label: 'Price Low to High', value: 'price'},
+                        {label: 'Year High to Low', value: '-year'},
+                        {label: 'Year Low to High', value: 'year'},
+                        {
+                            label: 'Model A-Z',
+                            value: ['model_version__model_version__brand__name', 'model_version__model_version__name']
+                        },
                     ],
                     current_page: 1,
                     page_per_row: 5,
@@ -161,8 +296,31 @@
                 this.getBodyTypes();
             },
             methods: {
-                onBrandFilter(event){
-                  this.getBrands(event.value)
+                showAdd(car_code) {
+                    this.display_additional = true;
+                    this.getAdd(car_code);
+                },
+                showImages(car_code) {
+                    this.display_images = true;
+                    this.getImages(car_code);
+                },
+                onPageCountChange(event) {
+                    this.page_row_count = event.value.value
+                    this.getCars()
+                },
+                onBrandSelect(event) {
+                    this.models_filter = null;
+                    this.getModels()
+                },
+                onModelFilter(event) {
+                    this.models_filter = event.value
+                    this.getModels(event.value)
+                },
+                onBrandFilter(event) {
+                    this.getBrands(event.value);
+                },
+                onSortChange(event) {
+                    this.getCars()
                 },
                 onCarPage(event) {
                     this.page = event.page + 1
@@ -178,6 +336,9 @@
                             end_year: vm.end_year,
                             brand: vm.selectedBrand,
                             body: vm.selectedBody,
+                            model: vm.selectedModel,
+                            sort_by: vm.sortKey ? vm.sortKey.value : null,
+                            per_page: vm.page_row_count,
                         }
                     })
                         .then(function (response) {
@@ -190,7 +351,7 @@
                             vm.answer = 'Error! Could not reach the API. ' + error
                         })
                 },
-                getBrands: function (brand_name=null) {
+                getBrands: function (brand_name = null) {
                     const vm = this
                     console.log('FETCH CARS')
                     axios.get('{% url 'brand_list_ajax' %}', {
@@ -207,6 +368,27 @@
                             vm.answer = 'Error! Could not reach the API. ' + error
                         })
                 },
+                getModels: function (model_name = null) {
+                    if (!this.selectedBrand && this.selectedBrand.length === 0) {
+                        return
+                    }
+                    const vm = this
+                    console.log('FETCH CARS')
+                    axios.get('{% url 'models_list_ajax' %}', {
+                        params: {
+                            brand: vm.selectedBrand,
+                            model: model_name,
+                        }
+                    })
+                        .then(function (response) {
+                            console.log('FETCH CARS RESPONSE', response.data.data_list)
+                            vm.models = response.data.data_list
+                        })
+                        .catch(function (error) {
+                            console.log('FETCH CARS RESPONSE', error)
+                            vm.answer = 'Error! Could not reach the API. ' + error
+                        })
+                },
                 getBodyTypes: function () {
                     const vm = this
                     console.log('FETCH CARS')
@@ -214,6 +396,38 @@
                         .then(function (response) {
                             console.log('FETCH CARS RESPONSE', response.data.data_list)
                             vm.body_types = response.data.data_list
+                        })
+                        .catch(function (error) {
+                            console.log('FETCH CARS RESPONSE', error)
+                            vm.answer = 'Error! Could not reach the API. ' + error
+                        })
+                },
+                getImages: function (car_code) {
+                    const vm = this
+                    axios.get('{% url 'images_ajax' %}', {
+                        params: {
+                            car_code: car_code,
+                        }
+                    })
+                        .then(function (response) {
+                            vm.car_images = response.data
+                            console.log(response.data)
+                        })
+                        .catch(function (error) {
+                            console.log('FETCH CARS RESPONSE', error)
+                            vm.answer = 'Error! Could not reach the API. ' + error
+                        })
+                },
+                getAdd: function (car_code) {
+                    const vm = this
+                    axios.get('{% url 'additional_ajax' %}', {
+                        params: {
+                            car_code: car_code,
+                        }
+                    })
+                        .then(function (response) {
+                            vm.dynamicContent = response.data
+                            console.log(response.data)
                         })
                         .catch(function (error) {
                             console.log('FETCH CARS RESPONSE', error)

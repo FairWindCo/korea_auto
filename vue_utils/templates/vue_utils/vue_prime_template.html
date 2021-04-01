@@ -212,51 +212,46 @@
 {% endblock %}
 {% block vue_app_config %}
     <script>
-        const APP_CONFIG = {
-
-        }
-        const APP_COMPONENTS = {
-
-        }
+        const APP_CONFIG = {}
+        const APP_COMPONENTS = {}
     </script>
 {% endblock %}
 {% block vue_app_base_config %}
     <script>
         const BASE_APP_COMPONENTS = {
-                {% for module in primevue_base|create_default_list:'checkbox,cascadeselect,button,inputtext,inputnumber,inputmask,inputswitch,password,radiobutton,menu,splitbutton,sidebar,dialog,inlinemessage,textarea,calendar,selectbutton,slider,togglebutton,tristatecheckbox,paginator,tooltip,message,fileupload' %}
-                    'p-{{ module }}': primevue.{{ module }},
-                {% endfor %}
-                {% for module in primevue_datatable|create_default_list:'dialog,sidebar,tooltip,overlaypanel' %}
-                    'p-{{ module }}': primevue.{{ module }},
-                {% endfor %}
-                {% for module in primevue_datatable|create_default_list:'knob,rating,chip,chips,colorpicker,organizationchart,avatar,badgedirective,blockui,inplace,scrolltop,skeleton,progressbar,progressspinner,tag' %}
-                    'p-{{ module }}': primevue.{{ module }},
-                {% endfor %}
-                {% for module in primevue_panels|create_default_list:'panel,accordion,accordiontab,card,splitter,splitterpanel,tabview,toolbar' %}
-                    'p-{{ module }}': primevue.{{ module }},
-                {% endfor %}
-                {% for module in primevue_listings|create_default_list:'listbox,dropdown,multiselect' %}
-                    'p-{{ module }}': primevue.{{ module }},
-                {% endfor %}
-                {% for module in primevue_menu|create_default_list:'breadcrumb,contextmenu,megamenu,panelmenu,tabmenu,steps,menubar' %}
-                    'p-{{ module }}': primevue.{{ module }},
-                {% endfor %}
-                {% for module in primevue_datatable|create_default_list:'column,columngroup,row,datatable,dataview,dataviewlayoutoptions,orderlist,picklist,timeline,tree,treetable' %}
-                    'p-{{ module }}': primevue.{{ module }},
-                {% endfor %}
-                {% if primevue_chart is None or primevue_chart %}
-                    'p-chart': primevue.chart,
-                {% endif %}
-                {% if primevue_media is None or primevue_media %}
-                    'p-carousel': primevue.carousel,
-                    'p-galleria': primevue.galleria,
-                {% endif %}
-                {% if primevue_confirmation is None or primevue_confirmation %}
-                    'confirmdialog': primevue.confirmdialog,
-                {% endif %}
-                {% if primevue_toast is None or primevue_toast %}
-                    'toast': primevue.toast,
-                {% endif %}
+            {% for module in primevue_base|create_default_list:'checkbox,cascadeselect,button,inputtext,inputnumber,inputmask,inputswitch,password,radiobutton,menu,splitbutton,sidebar,dialog,inlinemessage,textarea,calendar,selectbutton,slider,togglebutton,tristatecheckbox,paginator,tooltip,message,fileupload' %}
+                'p-{{ module }}': primevue.{{ module }},
+            {% endfor %}
+            {% for module in primevue_datatable|create_default_list:'dialog,sidebar,tooltip,overlaypanel' %}
+                'p-{{ module }}': primevue.{{ module }},
+            {% endfor %}
+            {% for module in primevue_datatable|create_default_list:'knob,rating,chip,chips,colorpicker,organizationchart,avatar,badgedirective,blockui,inplace,scrolltop,skeleton,progressbar,progressspinner,tag' %}
+                'p-{{ module }}': primevue.{{ module }},
+            {% endfor %}
+            {% for module in primevue_panels|create_default_list:'panel,accordion,accordiontab,card,splitter,splitterpanel,tabview,toolbar' %}
+                'p-{{ module }}': primevue.{{ module }},
+            {% endfor %}
+            {% for module in primevue_listings|create_default_list:'listbox,dropdown,multiselect' %}
+                'p-{{ module }}': primevue.{{ module }},
+            {% endfor %}
+            {% for module in primevue_menu|create_default_list:'breadcrumb,contextmenu,megamenu,panelmenu,tabmenu,steps,menubar' %}
+                'p-{{ module }}': primevue.{{ module }},
+            {% endfor %}
+            {% for module in primevue_datatable|create_default_list:'column,columngroup,row,datatable,dataview,dataviewlayoutoptions,orderlist,picklist,timeline,tree,treetable' %}
+                'p-{{ module }}': primevue.{{ module }},
+            {% endfor %}
+            {% if primevue_chart is None or primevue_chart %}
+                'p-chart': primevue.chart,
+            {% endif %}
+            {% for module in primevue_media|create_default_list:'carousel,galleria' %}
+                'p-{{ module }}': primevue.{{ module }},
+            {% endfor %}
+            {% if primevue_confirmation is None or primevue_confirmation %}
+                'confirmdialog': primevue.confirmdialog,
+            {% endif %}
+            {% if primevue_toast is None or primevue_toast %}
+                'toast': primevue.toast,
+            {% endif %}
         }
 
         const APP_BASE_CONFIG = {
@@ -270,9 +265,7 @@
             created() {
                 console.log('created', this)
             },
-            components: {
-
-            },
+            components: {},
             methods: {
                 delete_confirm() {
                     this.$confirm.require({
@@ -336,7 +329,7 @@
             app.use(primevue.toastservice);
         {% endif %}
 
-        for(let com_name in my_components){
+        for (let com_name in my_components) {
             app.component(com_name, my_components[com_name])
         }
 

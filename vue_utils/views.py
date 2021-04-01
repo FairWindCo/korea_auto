@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from django.http import Http404, JsonResponse
 from django.shortcuts import render
 # Create your views here.
@@ -14,6 +16,12 @@ def view_test(request):
 
 class FilterListView(ListView):
     """A base view for displaying a list of objects."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.user_defined_paging = self.paginate_by
+        self.user_defined_sort = self.ordering
+
     # Поля для по для фильтрации с описаниями:
     # Список из:
     # str - название поля
@@ -38,6 +46,9 @@ class FilterListView(ListView):
     # Поля для отображения (список имен)
     viewed_fields = None
 
+    page_row_request_field = 'per_page'
+    sort_request_field = 'sort_by'
+
     def get_additional_context_attribute(self):
         return {}
 
@@ -61,9 +72,20 @@ class FilterListView(ListView):
         if self.last_request and self.filters_fields:
             filter_def, self.filter_form_values = form_filter_dict(self.last_request, self.filters_fields,
                                                                    self.default_filter_action)
+            self.paginate_by = get_from_request(self.last_request, self.page_row_request_field,
+                                                self.user_defined_paging)
+            self.ordering = get_from_request(self.last_request, self.sort_request_field,
+                                             self.user_defined_sort)
+
             if filter_def:
                 print(filter_def, self.filter_form_values)
                 list_objects = list_objects.filter(**filter_def)
+            order = self.get_ordering()
+            if order:
+                if isinstance(order, Iterable) and not isinstance(order, str):
+                    list_objects = list_objects.order_by(*order)
+                else:
+                    list_objects = list_objects.order_by(order)
         if self.viewed_fields:
             view_field_desc = [get_from_container(field_name, [('field_name', None)], True)[0] for field_name in
                                self.viewed_fields]
