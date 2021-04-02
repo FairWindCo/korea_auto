@@ -37,6 +37,7 @@ class CarListViewAjax(FilterAjaxListView):
     #         'convertor': 'int'
     #     },
     # ]
+    ordering = 'price'
 
 
 class BrandListViewAjax(FilterAjaxListView):

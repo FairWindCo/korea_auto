@@ -4,7 +4,7 @@ from django.http import Http404, JsonResponse
 from django.shortcuts import render
 # Create your views here.
 from django.views.generic import ListView
-from importlib._common import _
+from django.utils.translation import gettext as _
 
 from vue_utils.utils import form_filter_dict, get_from_container, get_from_request, \
     my_serializer
@@ -78,7 +78,7 @@ class FilterListView(ListView):
                                              self.user_defined_sort)
 
             if filter_def:
-                print(filter_def, self.filter_form_values)
+                # print(filter_def, self.filter_form_values)
                 list_objects = list_objects.filter(**filter_def)
             order = self.get_ordering()
             if order:
@@ -136,7 +136,6 @@ class FilterAjaxListView(FilterListView):
         serializer = my_serializer
 
         viewed_fields = None
-        serialized_fields = None
 
         if self.viewed_fields is None and self.model:
             viewed_fields = [field_def.name for field_def in self.model._meta.fields]
@@ -167,7 +166,7 @@ class FilterAjaxListView(FilterListView):
                     context['data_list'] = []
                     count = self.object_list.count()
                     context['data_count'] = count
-                    context['page_count'] = count % page_size + 1
+                    context['page_count'] = count % int(page_size) + 1
                     context['page'] = get_from_request(request, 'page', 0)
                 else:
                     raise e404

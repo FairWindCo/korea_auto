@@ -1,3 +1,4 @@
+import collections
 import glob
 import os
 from typing import Iterable, Dict, Tuple, List
@@ -10,14 +11,12 @@ from django.core.paginator import Paginator
 def get_from_request(request, request_param_name, default_value=None, raise_exception=False):
     if request_param_name and request:
         if request.GET and request_param_name in request.GET:
-            print(request.GET)
             return request.GET.get(request_param_name)
         elif request.POST and request_param_name in request.POST:
             return request.POST.get(request_param_name)
         elif not request_param_name.endswith('[]'):
             request_param_name = request_param_name + '[]'
             if request.GET and request_param_name in request.GET:
-                print(request.GET)
                 return request.GET.getlist(request_param_name)
             elif request.POST and request_param_name in request.POST:
                 return request.POST.getlist(request_param_name)
@@ -51,42 +50,65 @@ def to_dict(obj, class_key=None):
         return obj
 
 
-def my_serializer(obj, serialized_fields, deep_serialized_fields=True, exec_method=True):
+def get_field_value(obj: any, field_name: str, default_val: any = None, can_call_function=True):
+    if obj and field_name:
+        if isinstance(obj, dict):
+            return obj.get(field_name, default_val)
+        elif isinstance(obj, collections.Sequence) and not isinstance(obj, str) and field_name.isnumeric():
+            index = int(field_name)
+            return default_val if len(obj) <= index else obj[index]
+        elif hasattr(obj, field_name):
+            val = getattr(obj, field_name)
+            if can_call_function and callable(val):
+                val = val()
+            return val
+        else:
+            return default_val
+    else:
+        return None
+
+
+def get_field_value_ex(obj: any, field_name: str, default_val: any = None, can_call_function=True):
+    if obj is None:
+        return default_val
+    if '__' in field_name:
+        fields = field_name.split('__')
+        if fields:
+            val = obj
+            for field in fields:
+                val = get_field_value(val, field, default_val)
+                if val is None:
+                    break
+            return val
+        return default_val
+    else:
+        return get_field_value(obj, field_name, default_val)
+
+
+def my_serializer(obj, serialized_fields, deep_serialized_fields=True, exec_method=True, skip_none=False):
     result = {}
-    print(obj)
     current_obj = obj
     if serialized_fields and isinstance(current_obj, dict) or hasattr(current_obj, "__dict__"):
         for field_desc in serialized_fields:
             current_obj = obj
-            field_name, convertor = get_from_container(field_desc, [
+            field_name, convertor, result_field, default_dict, ignore_error = get_from_container(field_desc, [
                 ('field_name', None),
-                ('convertor', None)
+                ('convertor', None),
+                ('result_field', None),
+                ('default_dict', False),
+                ('ignore_error', True),
             ], True)
-            current_val = None
 
-            if '__' in field_name:
-                fields = field_name.split('__')
-                if fields:
-                    for field in fields:
-                        if current_obj is None and not hasattr(current_obj, field):
-                            continue
-                        current_obj = getattr(current_obj, field)
-                    current_val = current_obj
+            if result_field is None:
+                result_field = field_name
 
-            elif hasattr(current_obj, field_name):
-                current_val = getattr(current_obj, field_name)
+            current_val = get_field_value_ex(obj, field_name, None, exec_method)
 
-            if current_obj is None:
-                continue
-
-            if exec_method and callable(current_val):
-                current_val = current_val()
-            print(field_name, current_val)
             if current_val:
-                result[field_name] = standard_value_converter(current_val, convertor, False, True,
-                                                              deep_serialized_fields)
+                result[result_field] = standard_value_converter(current_val, convertor, ignore_error, default_dict)
             else:
-                result[field_name] = None
+                if not skip_none:
+                    result[result_field] = None
     else:
         result = to_dict(current_obj)
     return result
@@ -134,7 +156,7 @@ def get_from_container(container, field_list_with_default_values: List[Tuple[str
     return result
 
 
-def standard_value_converter(value, converter, ignore_conversion_error=True, default_converter_to_str=False,
+def standard_value_converter(value, converter, ignore_conversion_error=True,
                              default_convert_to_dict=True):
     if value is not None and converter:
         try:
@@ -145,9 +167,14 @@ def standard_value_converter(value, converter, ignore_conversion_error=True, def
                     converted_value = int(value)
                 elif converter == 'float':
                     converted_value = float(value)
+                elif converter == 'dict':
+                    converted_value = to_dict(value)
                 elif converter.startswith() == 'serialize':
                     field_def = converter[9:-1].split(',')
-                    converted_value = my_serializer(value, field_def)
+                    if field_def:
+                        converted_value = my_serializer(value, field_def)
+                    else:
+                        converted_value = to_dict(value)
                 else:
                     converted_value = str(value)
         except ValueError as err:
@@ -158,12 +185,17 @@ def standard_value_converter(value, converter, ignore_conversion_error=True, def
                 print('Convert value error')
                 return None
     else:
-        if default_converter_to_str:
+        if hasattr(value, 'serializer'):
+            serializer = getattr(value, "serializer", None)
+            if callable(serializer):
+                return serializer(value)
+            return None
+        elif isinstance(value, (int, float, bool, str)) or not default_convert_to_dict:
             converted_value = str(value)
         elif default_convert_to_dict:
             converted_value = to_dict(value)
         else:
-            converted_value = value
+            converted_value = str(value)
     return converted_value
 
 
@@ -246,13 +278,13 @@ def get_image_data(dir, template, title='Car Photo ', thb_size=(150, 90), prepen
             count += 1
             base_name = os.path.basename(infile)
             path = os.path.dirname(infile)
-            thd_name = 'thb_'+base_name
+            thd_name = 'thb_' + base_name
             thd_file = os.path.join(path, thd_name)
             if not os.path.exists(thd_file):
                 create_thumbnail(infile, thd_file, thb_size)
 
             result.append({
-                'itemImageSrc': f'{prepend_url}/{base_name}'if prepend_url else base_name,
+                'itemImageSrc': f'{prepend_url}/{base_name}' if prepend_url else base_name,
                 'thumbnailImageSrc': f'{prepend_url}/{thd_name}' if prepend_url else thd_name,
                 'title': f'{title} {count}'
             })

@@ -88,7 +88,7 @@
                                 <div class="product-name p-col-12"><h5>@{ slotprops.data.model_version }@</h5></div>
 
                                 <div class="p-col-4">
-                                    <img :src="slotprops.data.ge_thb_image" style="width: 100%;"
+                                    <img :src="slotprops.data.ge_thb_image" style="width: 100%;cursor: pointer;"
                                          @click="showImages(slotprops.data.car_code)">
                                 </div>
                                 <div class="p-col-8">
@@ -111,7 +111,7 @@
                             </div>
                             <div class="product-grid-item-content p-d-flex p-flex-wrap">
                                 <div class="p-col-24">
-                                    <img :src="slotprops.data.ge_thb_image" style="width: 100%;"
+                                    <img :src="slotprops.data.ge_thb_image" style="width: 100%;cursor: pointer;"
                                          @click="showImages(slotprops.data.car_code)">
                                 </div>
                                 <div class="p-col-24 p-d-flex p-flex-wrap">
@@ -200,23 +200,27 @@
         </p-SplitterPanel>
     </p-Splitter>
 
-    <p-Dialog header="Галерея" v-model:visible="display_images" :breakpoints="{'960px': '75vw', '640px': '100vw'}"
+    <p-Galleria :value="car_images" :num-visible="7" v-if="car_images && car_images.length > 0" class="p-col-20"
+                thumbnails-position="bottom" container-style="max-width: 850px; width:70vw;"
+                :circular="true" :full-screen="true"
+                v-model:visible="display_images"
+    >
+        <template #item="slotProps">
+            <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
+                 style="width: 100%; display: block;"/>
+        </template>
+        <template #thumbnail="slotProps">
+            <div class="p-grid p-nogutter p-justify-center">
+                <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
+                     style="width: 100%; display: block;"/>
+            </div>
+        </template>
+    </p-Galleria>
+
+    <p-Dialog header="Галерея" :breakpoints="{'960px': '75vw', '640px': '100vw'}"
               :style="{width: '50vw'}">
         <div class="p-d-flex p-flex-row p-col-12 p-jc-center p-0">
-            <p-Galleria :value="car_images" :num-visible="3" v-if="car_images && car_images.length > 0" class="p-col-20"
-                        thumbnails-position="bottom" container-style="max-width: 640px; width:70vw;"
-            >
-                <template #item="slotProps">
-                    <img :src="slotProps.item.itemImageSrc" :alt="slotProps.item.alt"
-                         style="width: 100%; display: block;"/>
-                </template>
-                <template #thumbnail="slotProps">
-                    <div class="p-grid p-nogutter p-justify-center">
-                        <img :src="slotProps.item.thumbnailImageSrc" :alt="slotProps.item.alt"
-                             style="width: 100%; display: block;"/>
-                    </div>
-                </template>
-            </p-Galleria>
+
             <p-ProgressBar mode="indeterminate" style="height: .5em"
                            v-if="!car_images || car_images.length == 0"/>
         </div>
@@ -301,7 +305,7 @@
                     this.getAdd(car_code);
                 },
                 showImages(car_code) {
-                    this.display_images = true;
+                    //this.display_images = true;
                     this.getImages(car_code);
                 },
                 onPageCountChange(event) {
@@ -411,6 +415,7 @@
                     })
                         .then(function (response) {
                             vm.car_images = response.data
+                            vm.display_images = true
                             console.log(response.data)
                         })
                         .catch(function (error) {
