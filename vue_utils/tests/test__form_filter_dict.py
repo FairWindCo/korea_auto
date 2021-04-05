@@ -106,12 +106,11 @@ class TestStringMethods(unittest.TestCase):
         self.assertEqual({'car__equal': 10}, result)
         self.assertEqual({'field_1': 10}, form)
 
-
     def test_get_from_dict_with_convert_ignore_error(self):
         test_request = request_mok()
         test_request.GET = {
             'field_1': {
-                'value': 'f10',
+                'value': '10',
                 'action': 'equal'
             }
         }
@@ -125,14 +124,14 @@ class TestStringMethods(unittest.TestCase):
         ]
 
         result, form = form_filter_dict(test_request, field_def)
-        self.assertEqual({'car__equal': 'f10'}, result)
-        self.assertEqual({'field_1': 'f10'}, form)
+        self.assertEqual({'car__equal': 10}, result)
+        self.assertEqual({'field_1': 10}, form)
 
     def test_get_from_dict_with_custom_convert(self):
         test_request = request_mok()
         test_request.GET = {
             'field_1': {
-                'value': 'f10',
+                'value': '10',
                 'action': 'equal'
             }
         }
@@ -146,10 +145,9 @@ class TestStringMethods(unittest.TestCase):
         ]
 
         result, form = form_filter_dict(test_request, field_def)
-        self.assertEqual({'car__equal': 'f10'}, result)
-        self.assertEqual({'field_1': 'f10'}, form)
+        self.assertEqual({'car__equal': 10}, result)
+        self.assertEqual({'field_1': 10}, form)
 
 
 if __name__ == '__main__':
-    test = TestStringMethods.test_get_from_dict_value()
     unittest.main()
