@@ -1,3 +1,6 @@
 /.idea/
 /venv/
 .env
+*.tag.gz
+/vue_utils/dist/
+/vue_utils/vue_utils.egg-info/

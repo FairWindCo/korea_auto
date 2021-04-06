@@ -21,3 +21,4 @@ sniffio==1.2.0
 soupsieve==2.2
 sqlparse==0.4.1
 urllib3==1.26.3
+-e git+https://github.com/FairWindCo/vue_utils@93e8ba3992338df5004c28d4c3635335746dadfb#egg=vue_utils
