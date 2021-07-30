@@ -18,6 +18,7 @@ class Command(BaseCommand):
         parser.add_argument('--donji', type=int, dest='donji', default=94001)
         parser.add_argument('--brand', type=int, dest='brand', default=None)
         parser.add_argument('--model', type=int, dest='model', default=None)
+        parser.add_argument('--proxy', type=str, dest='proxy', default=None)
 
     def handle(self, *args, **options):
         import_car_data(options['user'],
@@ -29,5 +30,6 @@ class Command(BaseCommand):
                         options['area'],
                         options['donji'],
                         options['brand'],
-                        options['model']
+                        options['model'],
+                        options['proxy']
                         )

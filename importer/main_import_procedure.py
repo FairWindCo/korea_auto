@@ -24,7 +24,7 @@ def convert_password(password):
     return base64_ecoder(quoted)
 
 
-def login2(user, password):
+def login2(user, password, proxy=None):
     session = requests.Session()
     url = 'http://www.carmanager.co.kr/User/Login/'
     header = {
@@ -32,24 +32,45 @@ def login2(user, password):
         'Accept': 'text / html, application / xhtml + xml, application / xml;     q = 0.9, image / avif, image / webp, image / apng, * / *;q = 0.8, application / signed - exchange;     v = b3;  q = 0.9',
         'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7,ru;q=0.6',
     }
-    resp = session.get(url, headers=header)
+
+    params = {
+        'headers': header
+    }
+    if proxy:
+        if isinstance(proxy, str):
+            params['proxies'] = {
+                'http': proxy
+            }
+        else:
+            params['proxies'] = proxy
+
+    resp = session.get(url, **params)
     soup = BeautifulSoup(resp.content, 'html.parser')
     cookies = resp.cookies
     # print(resp.text)
-
+    params['cookies'] = resp.cookies
     elements = soup.find_all('ul', class_='login-input')
 
     if elements:
         print('NEED LOGIN')
         url = 'http://www.carmanager.co.kr/User/Login'
         header['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8'
-        resp = session.post(url, data={
-            'cbxrememberid': 'on',
-            'sbxgubun': '1',
-            'returnurl': '',
-            'userid': user,
-            'userpwd': password
-        }, cookies=cookies, headers=header)
+        if proxy:
+            resp = session.post(url, data={
+                'cbxrememberid': 'on',
+                'sbxgubun': '1',
+                'returnurl': '',
+                'userid': user,
+                'userpwd': password
+            }, **params)
+        else:
+            resp = session.post(url, data={
+                'cbxrememberid': 'on',
+                'sbxgubun': '1',
+                'returnurl': '',
+                'userid': user,
+                'userpwd': password
+            }, **params)
         soup = BeautifulSoup(resp.content, 'html.parser')
         elements = soup.find_all('ul', class_='login-input')
         menu_div = soup.find('div', id='ui_logingnb')
@@ -59,11 +80,11 @@ def login2(user, password):
             print('LOGIN - OK!')
             print('COOKIES ', session.cookies.get_dict())
             url = 'http://www.carmanager.co.kr/'
-            resp = session.get(url, headers=header)
+            resp = session.get(url, **params)
             if test_page_is_login(resp.content):
                 print('MAIN PAGE')
                 url = 'http://www.carmanager.co.kr/Car/Data'
-                resp = session.get(url, headers=header)
+                resp = session.get(url, **params)
                 if test_page_is_login(resp.content):
                     return True, session
                 else:
@@ -79,13 +100,24 @@ def login2(user, password):
         return False, 'Шаблон сайта не совпадает'
 
 
-def get_page_data(session, page=1, per_page_count=10, region=103, area=1035, donji=94001, brand=None, model=None):
+def get_page_data(session, page=1, per_page_count=10, region=103, area=1035, donji=94001, brand=None, model=None,
+                  proxy=None):
     header = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36',
         'Accept': 'text / html, application / xhtml + xml, application / xml; q = 0.9, image / avif, image / webp, image / apng, * / *;q = 0.8, application / signed - exchange; v = b3;  q = 0.9',
         'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7,ru;q=0.6',
     }
     url = 'http://www.carmanager.co.kr/CarData/JsonCarData'
+    params = {
+        'headers': header
+    }
+    if proxy:
+        if isinstance(proxy, str):
+            params['proxies'] = {
+                'http': proxy
+            }
+        else:
+            params['proxies'] = proxy
     page_param = {
         "PageNow": page,
         "PageSize": per_page_count,
@@ -123,7 +155,7 @@ def get_page_data(session, page=1, per_page_count=10, region=103, area=1035, don
         "CarTruckTonS": "",
         "CarTruckTonE": ""
     }
-    resp = session.post(url, data=page_param, headers=header)
+    resp = session.post(url, data=page_param, **params)
     return resp.json()
 
 
@@ -136,14 +168,23 @@ def test_page_is_login(page):
     return True if not elements and menu_element else False
 
 
-def login(user, password):
+def login(user, password, proxy=None):
     url = 'https://www.glovisaa.com/login.do'
     header = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36',
         'Accept': 'text / html, application / xhtml + xml, application / xml;     q = 0.9, image / avif, image / webp, image / apng, * / *;q = 0.8, application / signed - exchange;     v = b3;  q = 0.9',
         'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7,ru;q=0.6',
     }
-    resp = requests.get(url, headers=header)
+    params = {
+        'header': header
+    }
+
+    if proxy:
+        resp = requests.get(url, headers=header, proxy={
+            'http': proxy
+        })
+    else:
+        resp = requests.get(url, headers=header)
 
     soup = BeautifulSoup(resp.content, 'html.parser')
     cookies = resp.cookies
@@ -209,7 +250,8 @@ def get_and_write_file_cached(cache, index, url, path, name, session, save_origi
             return True, file_name
 
 
-def get_and_write_file(url, path, name, session, save_original_name=False, add_name_part='img', base_site_url=''):
+def get_and_write_file(url, path, name, session, save_original_name=False, add_name_part='img', base_site_url='',
+                       proxy=None):
     header = {
         'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/88.0.4324.190 Safari/537.36',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
@@ -217,11 +259,22 @@ def get_and_write_file(url, path, name, session, save_original_name=False, add_n
         'Accept-Language': 'uk-UA,uk;q=0.9,en-US;q=0.8,en;q=0.7,ru;q=0.6',
         'sec-ch-ua': '"Chromium";v="88", "Google Chrome";v="88", ";Not A Brand";v="99"',
     }
+    params = {
+        'headers': header
+    }
+    if proxy:
+        if isinstance(proxy, str):
+            params['proxies'] = {
+                'http': proxy
+            }
+        else:
+            params['proxies'] = proxy
+
     if not url.startswith('http'):
         file_url = base_site_url + url
     else:
         file_url = url
-    r = session.get(file_url, headers=header)
+    r = session.get(file_url, **params)
     if r.status_code == 200:
         if save_original_name:
             url_elements = urlparse(file_url)
@@ -250,10 +303,10 @@ reg_exp = re.compile(r'[0-9]+')
 reg_exp_url = re.compile((r'url\([A-Za-z0-9\/\.-_]+\)'))
 
 
-def process_protocol(code, path, session):
+def process_protocol(code, path, session, proxy):
     content, file_name = get_and_write_file(f'http://autocafe.co.kr/ASSO/CarCheck_Form.asp?OnCarNo={code}', path,
                                             'add.html',
-                                            session)
+                                            session, proxy=proxy)
     soap = BeautifulSoup(content, 'html.parser')
     protocol_image = 1
     url_replaced = {}
@@ -286,9 +339,11 @@ def process_protocol(code, path, session):
                         protocol_image += 1
     with open(f'{path}/add.html', "wb") as f_output:
         f_output.write(soap.prettify("utf-8"))
+    with open(f'{path}/original_add.html', "wb") as f_output:
+        f_output.write(soap.prettify("utf-8"))
 
 
-def process_additional_data(content, session, path):
+def process_additional_data(content, session, path, proxy):
     soap = BeautifulSoup(content, 'html.parser')
     images = soap.find_all('img')
     image_count = 1
@@ -305,10 +360,10 @@ def process_additional_data(content, session, path):
                 print(area.attrs['onclick'])
                 val = reg_exp.findall(area.attrs['onclick'])
                 if val:
-                    process_protocol(val[0], path, session)
+                    process_protocol(val[0], path, session, proxy=proxy)
 
 
-def process_car_data(object_car, path, session):
+def process_car_data(object_car, path, session, proxy):
     carno = object_car['CarNo']
     car_path = f'{path}/{carno}'
     if not os.path.exists(car_path):
@@ -321,7 +376,7 @@ def process_car_data(object_car, path, session):
         url = f'http://www.carmanager.co.kr/PopupFrame/CarDetail/{carno}'
         data, file_name = get_and_write_file(url, car_path, f'detail.html', session, add_name_part='')
         if data:
-            process_additional_data(data, session, car_path)
+            process_additional_data(data, session, car_path, proxy)
         for i in range(1, 6):
             key_name = f'CarMarkImageURL{i}'
             image_url = object_car[key_name]
@@ -332,19 +387,19 @@ def process_car_data(object_car, path, session):
 
 def import_car_data(login, password, db_path='DataBase', max_page=1, per_page_count=10, region=103, area=1035,
                     donji=94001,
-                    brand=None, model=None):
-    res, info = login2(login, password)
+                    brand=None, model=None, proxy=None):
+    res, info = login2(login, password, proxy)
     if res:
         session = info
-        objects = get_page_data(session, 1, per_page_count, region, area, donji, brand, model)
+        objects = get_page_data(session, 1, per_page_count, region, area, donji, brand, model, proxy)
         total_count = objects[0]['CountTotal']
         print(f'TOTAL CARS ON SITE WITH REQUEST PARAMS {total_count}')
         for obj in objects:
-            process_car_data(obj, db_path, session)
+            process_car_data(obj, db_path, session, proxy)
         for i in range(2, max_page):
             objects = get_page_data(session, i)
             for obj in objects:
                 for obj in objects:
-                    process_car_data(obj, db_path, session)
+                    process_car_data(obj, db_path, session, proxy)
     else:
         print(info)
