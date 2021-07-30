@@ -12,24 +12,28 @@ class Command(BaseCommand):
         parser.add_argument('--file_database_dir', type=str, dest='database_dir', default='./DataBase/')
         parser.add_argument('--user', type=str, dest='user', default=settings.KOREA_SITE_USER)
         parser.add_argument('--pass', type=str, dest='password', default=settings.KOREA_SITE_PASS)
-        parser.add_argument('--par_page', type=int, dest='peg_page', default=10)
+        parser.add_argument('--per_page', type=int, dest='per_page', default=10)
         parser.add_argument('--region', type=int, dest='region', default=103)
         parser.add_argument('--area', type=int, dest='area', default=1035)
         parser.add_argument('--donji', type=int, dest='donji', default=94001)
         parser.add_argument('--brand', type=int, dest='brand', default=None)
         parser.add_argument('--model', type=int, dest='model', default=None)
         parser.add_argument('--proxy', type=str, dest='proxy', default=None)
+        parser.add_argument('--timeout', type=int, dest='timeout', default=10)
+        parser.add_argument('--detail_only_proxy', type=bool, dest='detail_only_proxy', default=True)
 
     def handle(self, *args, **options):
         import_car_data(options['user'],
                         options['password'],
                         options['database_dir'],
                         options['max_page'],
-                        options['peg_page'],
+                        options['per_page'],
                         options['region'],
                         options['area'],
                         options['donji'],
                         options['brand'],
                         options['model'],
-                        options['proxy']
+                        options['proxy'],
+                        options['detail_only_proxy'],
+                        options['timeout']
                         )

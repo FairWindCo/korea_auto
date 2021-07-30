@@ -132,7 +132,7 @@ class Car(models.Model):
     image_count = models.IntegerField(default=0, verbose_name='Кол-во изображений')
     car_LPG_use = models.BooleanField(default=False, verbose_name='Испольузет ГАЗ')
     plate_number = models.CharField(verbose_name='Номерной знак', max_length=15)
-    vin_number = models.CharField(verbose_name='VIN CODE', max_length=25)
+    vin_number = models.CharField(verbose_name='VIN CODE', max_length=25, blank=True, null=True)
     mileage = models.IntegerField(default=0, verbose_name='Пробег')
     jesi_no = models.IntegerField(default=0, verbose_name='JESI site code')
     first_register_date = models.DateField(verbose_name='Дата первой регистации', blank=True, null=True)
